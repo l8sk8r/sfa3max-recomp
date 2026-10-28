@@ -3,7 +3,7 @@
     One-shot build of sfa3r.exe: update main, regenerate the translated C, configure and build.
 
 .DESCRIPTION
-    Runs, in order:
+    Runs, in order (the git steps only in a git clone; a release's source zip has no .git):
         git checkout main
         git pull
         python tools/prepare.py
@@ -43,6 +43,11 @@ function Step([string]$Title, [scriptblock]$Action) {
 }
 
 $timer = [System.Diagnostics.Stopwatch]::StartNew()
+$isClone = Test-Path (Join-Path $PSScriptRoot ".git")
+if (-not $isClone) {
+    Write-Host "Not a git clone (a release's source zip?): building these files as they are." -ForegroundColor Yellow
+    $Here = $true; $NoPull = $true
+}
 
 if (-not $Here) {
     # Don't let a checkout carry uncommitted work onto another branch.
@@ -69,7 +74,8 @@ Step "cmake build ($Config)" { cmake --build out --config $Config }
 
 $timer.Stop()
 Write-Host ""
-Write-Host ("Build succeeded on '{0}' in {1:mm\:ss}: out\{2}\sfa3r.exe" -f (git branch --show-current), $timer.Elapsed, $Config) -ForegroundColor Green
+$what = if ($isClone) { "'" + (git branch --show-current) + "'" } else { "this folder" }
+Write-Host ("Build succeeded on {0} in {1:mm\:ss}: out\{2}\sfa3r.exe" -f $what, $timer.Elapsed, $Config) -ForegroundColor Green
 
 if ($Run) {
     Step "run sfa3r" { & ".\out\$Config\sfa3r.exe" --work work }

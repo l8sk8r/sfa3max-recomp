@@ -71,6 +71,12 @@ if(WIN32)
   target_sources(sfa3r PRIVATE "${CMAKE_SOURCE_DIR}/res/sfa3r.rc")
 endif()
 
+# The version (VERSION, shown on EX. SETTING); changing the file re-runs CMake
+file(STRINGS "${CMAKE_SOURCE_DIR}/VERSION" SFA3R_VER LIMIT_COUNT 1)
+string(STRIP "${SFA3R_VER}" SFA3R_VER)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/VERSION")
+target_compile_definitions(sfa3r PRIVATE "SFA3R_VERSION=\"V${SFA3R_VER}\"")
+
 if(MSVC)
   target_compile_options(sfa3r PRIVATE /W3 /wd4102 /wd4100 /wd4996 /bigobj /utf-8 /we4013)   # C4013: a function used before it is declared is an error, as with gcc below
   target_compile_definitions(sfa3r PRIVATE _CRT_SECURE_NO_WARNINGS)

@@ -133,23 +133,60 @@ CMake downloads and builds SDL3 the first time (a few minutes). `prepare.py` als
 
 ## Building
 
+### Windows
+
+1. Install the [prerequisites](#prerequisites) above.
+2. Download **sfa3max-recomp.zip** from the [latest release](https://github.com/l8sk8r/sfa3max-recomp/releases/latest).
+3. Unzip it and move the `sfa3max-recomp` folder inside to a location of your choice. In this example
+   it goes in `C:\`, so you have `C:\sfa3max-recomp`.
+4. Copy your ISO into it as `C:\sfa3max-recomp\imports\psp\Street Fighter Alpha 3 Max.iso` (make the
+   `imports\psp` folders if they are not there).
+5. Search for and launch **Windows PowerShell**.
+6. Change to the folder:
+   ```
+   cd C:\sfa3max-recomp
+   ```
+7. Build, and start the game when it is done:
+   ```
+   .\build.ps1 -Run
+   ```
+   The first build takes a while: it extracts the disc, translates the game and downloads SDL3. If
+   PowerShell says running scripts is disabled, run `Set-ExecutionPolicy -Scope Process Bypass` in the
+   same window first. Other options are [below](#buildps1-options).
+
+**Playing after that:** in PowerShell,
+```
+cd C:\sfa3max-recomp
+.\out\Release\sfa3r.exe --work work
+```
+or make a shortcut to `C:\sfa3max-recomp\out\Release\sfa3r.exe` with `--work C:\sfa3max-recomp\work`
+after it in the shortcut's Target.
+
+**Updating:** download the new release's zip and unzip it over the same folder (your ISO, `work\` and
+saves stay), then run `.\build.ps1 -Run` again.
+
+### build.ps1 options
+
+| Option | |
+|---|---|
+| `-Run` | start the game after a successful build |
+| `-Iso path` | the ISO, if it is not at `imports\psp\Street Fighter Alpha 3 Max.iso` (or set `SFA3R_ISO`) |
+| `-ForceWideScreen:$false` | build without the 16:9 patch (no WIDE FORCED) |
+| `-SkipPrepare` | reuse the extracted disc and translated code from the last build |
+| `-Config Debug` | a debug build (`out\Debug\sfa3r.exe`) |
+| `-Here`, `-NoPull` | in a git clone: build the current branch / do not pull first (by default it checks out and pulls `main`) |
+
+### From a git clone (developers)
+
+The same script works in a clone; by default it checks out and pulls `main` first. In VS Code it is the
+default build task (**Ctrl+Shift+B**). By hand:
+
 ```
 python tools/prepare.py
 cmake -B out -G "Visual Studio 18 2026" -A x64
 cmake --build out --config Release
 out\Release\sfa3r.exe --work work
 ```
-
-Or all in one go: `.\build.ps1` (from a git clone or from a release's source zip; see below). An ISO elsewhere: `prepare.py path\to\game.iso`, `.\build.ps1 -Iso path`,
-or set `SFA3R_ISO`.
-It checks out and pulls `main` first; `-Here` builds the current branch, and `-ForceWideScreen:$false` (no 16:9 patch), `-NoPull`,
-`-SkipPrepare` and `-Run` do what they say. In VS Code it is the default build task (**Ctrl+Shift+B**).
-
-**From a release:** download the release's *Source code (zip)*, unzip it (for example to
-`C:\sfa3max-recomp`), put your ISO at `imports\psp\Street Fighter Alpha 3 Max.iso` inside it, then in
-PowerShell in that folder run `.\build.ps1 -Run`. Without a `.git` folder the script skips its git
-steps and builds the files as they are. If PowerShell refuses to run the script, run
-`Set-ExecutionPolicy -Scope Process Bypass` in that window first.
 
 `prepare.py` writes `work/` (the disc's files and the analysis) and `build/generated/` (the translated
 C). Both are git-ignored and must never be committed. Re-run it after pulling changes to `tools/`.

@@ -44,6 +44,13 @@ merge `main` in if it moves on.
 
 The maintainer reviews, may ask for changes, and merges.
 
+## Releases (maintainer)
+
+A release is made by merging a version: in the pull request, raise `VERSION` (for example `1.0.2` to
+`1.0.3`) and add a section for it at the top of [CHANGELOG.md](CHANGELOG.md). Once it is merged into
+`main`, the release workflow tags it `v1.0.3` and publishes the release with that section as its notes
+and `sfa3max-recomp.zip` attached. The game shows the same version on EX. SETTING.
+
 ## Code
 
 - C for the runtime (`src/runtime/`), Python for the tools (`tools/`).

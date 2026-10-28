@@ -1,0 +1,35 @@
+# A release for each new version: when a push to main carries a VERSION with no tag yet, this tags
+# it v<VERSION> and publishes a release with that version's CHANGELOG.md section and a source zip
+# whose folder is plain sfa3max-recomp (GitHub's own source zips add the version to the folder name).
+name: Release
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Version
+        id: v
+        run: |
+          v=$(tr -d ' \r\n' < VERSION)
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/v$v" > /dev/null; then echo "exists=1" >> "$GITHUB_OUTPUT"; fi
+      - name: Release
+        if: steps.v.outputs.exists != '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          V: ${{ steps.v.outputs.version }}
+        run: |
+          {
+            echo "> **No game is included.** You build SFA3R from your own copy of the game (the US PSP disc, \`ULUS-10062\`): download **sfa3max-recomp.zip** below and follow [Building](https://github.com/${GITHUB_REPOSITORY}#building)."
+            echo
+            awk -v v="$V" '/^## /{p=($2==v); next} p' CHANGELOG.md
+          } > notes.md
+          git archive --format=zip --prefix=sfa3max-recomp/ -o sfa3max-recomp.zip HEAD
+          gh release create "v$V" sfa3max-recomp.zip --target "$GITHUB_SHA" --title "SFA3R v$V" --notes-file notes.md

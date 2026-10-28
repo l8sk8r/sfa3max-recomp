@@ -4,6 +4,10 @@ Each version's section here becomes its release notes. To release: in the pull r
 `VERSION` and add its section below; merging into `main` tags it and publishes the release
 (`.github/workflows/release.yml`).
 
+## 1.0.3
+
+- Fixes to the build documentation and steps.
+
 ## 1.0.2
 
 - Clearer building steps in the README, from download to playing.

@@ -136,9 +136,10 @@ CMake downloads and builds SDL3 the first time (a few minutes). `prepare.py` als
 ### Windows
 
 1. Install the [prerequisites](#prerequisites) above.
-2. Download **sfa3max-recomp.zip** from the [latest release](https://github.com/l8sk8r/sfa3max-recomp/releases/latest).
-3. Unzip it and move the `sfa3max-recomp` folder inside to a location of your choice. In this example
-   it goes in `C:\`, so you have `C:\sfa3max-recomp`.
+2. Download the **Source code (zip)** of the [latest release](https://github.com/l8sk8r/sfa3max-recomp/releases/latest).
+3. Open the zip and copy the folder from inside it. Rename it without the version number, so it
+   becomes `sfa3max-recomp`, and move it where you want to run it. In this example it is
+   `C:\sfa3max-recomp`.
 4. Copy your ISO into it as `C:\sfa3max-recomp\imports\psp\Street Fighter Alpha 3 Max.iso` (make the
    `imports\psp` folders if they are not there).
 5. Search for and launch **Windows PowerShell**.
@@ -162,8 +163,8 @@ cd C:\sfa3max-recomp
 or make a shortcut to `C:\sfa3max-recomp\out\Release\sfa3r.exe` with `--work C:\sfa3max-recomp\work`
 after it in the shortcut's Target.
 
-**Updating:** download the new release's zip and unzip it over the same folder (your ISO, `work\` and
-saves stay), then run `.\build.ps1 -Run` again.
+**Updating:** download the new release's Source code (zip) and copy what is in its folder over your
+`sfa3max-recomp` folder (your ISO, `work\` and saves stay), then run `.\build.ps1 -Run` again.
 
 ### build.ps1 options
 

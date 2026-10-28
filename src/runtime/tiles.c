@@ -186,7 +186,7 @@ static void background(uint16_t out[OH][OW], uint32_t pc, int v0, int mirror) {
         m2[y][x] = (uint8_t)any;
     }
     /* which diagonal the gradient runs along: the one with the smallest change between clean neighbours */
-    int dir = 0; long bests = -1;
+    int dir = 0; long long bests = -1;
     for (int d = -1; d <= 1; d++) {
         long s = 0, n = 0;
         for (int y = 3; y < OH - 4; y++) for (int x = 4; x < OW - 5; x++) {
@@ -194,7 +194,7 @@ static void background(uint16_t out[OH][OW], uint32_t pc, int v0, int mirror) {
             uint16_t a = t[y][x], b = t[y + 1][x + d];
             s += abs(r5(a) - r5(b)) + abs(g5(a) - g5(b)) + abs(b5(a) - b5(b)); n++;
         }
-        long sc = n ? s * 1000 / n : 1L << 40;
+        long long sc = n ? (long long)s * 1000 / n : 1LL << 40;
         if (bests < 0 || sc < bests) { bests = sc; dir = d; }
     }
     for (int y = 0; y < OH; y++) for (int x = 0; x < OW; x++) {

@@ -4,6 +4,12 @@ Each version's section here becomes its release notes. To release: in the pull r
 `VERSION` and add its section below; merging into `main` tags it and publishes the release
 (`.github/workflows/release.yml`).
 
+## 1.1.0
+
+- Nothing to install to build: `build.ps1` downloads its own compiler (LLVM-MinGW), CMake, Ninja and,
+  if needed, Python. Visual Studio, Git and pip are no longer needed (`-VisualStudio` still uses
+  Visual Studio).
+
 ## 1.0.3
 
 - Fixes to the build documentation and steps.

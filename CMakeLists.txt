@@ -1,6 +1,7 @@
 # SFA3R: build the native game from the translated code.
 #   python tools/prepare.py            (writes work/ and build/generated/)
-#   cmake -B out                       (Visual Studio 2026: cmake -B out -G "Visual Studio 18 2026" -A x64)
+#   cmake -B out                       (build.ps1: Ninja + LLVM-MinGW it downloads; or Visual Studio 2026:
+#                                       cmake -B out -G "Visual Studio 18 2026" -A x64)
 #   cmake --build out --config Release
 #   out/Release/sfa3r.exe --work work
 cmake_minimum_required(VERSION 3.20)
@@ -56,7 +57,10 @@ endif()
 
 if(SFA3R_SDL)
   include(FetchContent)
-  FetchContent_Declare(SDL3 GIT_REPOSITORY https://github.com/libsdl-org/SDL.git GIT_TAG release-3.4.16 GIT_SHALLOW TRUE)
+  FetchContent_Declare(SDL3
+    URL https://github.com/libsdl-org/SDL/releases/download/release-3.4.16/SDL3-3.4.16.tar.gz
+    URL_HASH SHA256=7322236cd12090c3eb40b9728be4d49c76f66ad17d04369584d4ecad5cf77c68
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
   set(SDL_SHARED OFF CACHE BOOL "" FORCE)
   set(SDL_STATIC ON CACHE BOOL "" FORCE)
   set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
@@ -67,6 +71,15 @@ endif()
 
 if(WIN32)
   target_link_libraries(sfa3r PRIVATE ws2_32)
+  if(NOT CMAKE_CONFIGURATION_TYPES)   # Ninja (build.ps1's own toolchain): out/Release/sfa3r.exe, as Visual Studio puts it
+    if(NOT CMAKE_BUILD_TYPE)
+      set(CMAKE_BUILD_TYPE Release)
+    endif()
+    set_target_properties(sfa3r PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
+  endif()
+  if(MINGW)
+    target_link_options(sfa3r PRIVATE -static)   # no MinGW runtime DLLs next to the exe
+  endif()
   # Exe icon (res/sfa3r.ico); SDL also picks it up for the window and taskbar
   target_sources(sfa3r PRIVATE "${CMAKE_SOURCE_DIR}/res/sfa3r.rc")
 endif()

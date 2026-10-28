@@ -17,6 +17,7 @@
 *.prx
 *.BIN
 # Extracted / generated / build output
+/.tools/
 /work/
 /work
 /build/

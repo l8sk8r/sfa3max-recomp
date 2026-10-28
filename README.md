@@ -121,21 +121,21 @@ Open problems: [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md).
 
 ## Prerequisites
 
-- Windows 10 / 11, x64
-- Visual Studio 2026 with C/C++ (includes CMake)
-- Python 3.9+ with `pip install pycdlib`
-- Git (also needed when building from a release zip: it fetches SDL3 and the widescreen patch)
+- Windows 10 (1803 or later) or 11, x64
 - Your own **Street Fighter Alpha 3 MAX** PSP disc image (ISO), US release `ULUS-10062`, placed at
   `imports\psp\Street Fighter Alpha 3 Max.iso` (git-ignored)
+- An internet connection for the first build
 
-CMake downloads and builds SDL3 the first time (a few minutes). `prepare.py` also downloads the SFA3MAX
-16:9 patch (Rickow, MIT) for WIDE FORCED; `--no-widescreen` leaves it out.
+Nothing else needs installing. The first build downloads its own build tools into `.tools\` inside the
+folder (about 300 MB: the LLVM-MinGW compiler, CMake, Ninja, and Python if you don't have 3.9 or later),
+plus SDL3 and the SFA3MAX 16:9 patch (Rickow, MIT) for WIDE FORCED. Later builds reuse them. To remove
+everything, delete the folder.
 
 ## Building
 
 ### Windows
 
-1. Install the [prerequisites](#prerequisites) above.
+1. Check the [prerequisites](#prerequisites) above.
 2. Download the **Source code (zip)** of the [latest release](https://github.com/l8sk8r/sfa3max-recomp/releases/latest).
 3. Open the zip and copy the folder from inside it. Rename it without the version number, so it
    becomes `sfa3max-recomp`, and move it where you want to run it. In this example it is
@@ -151,9 +151,9 @@ CMake downloads and builds SDL3 the first time (a few minutes). `prepare.py` als
    ```
    .\build.ps1 -Run
    ```
-   The first build takes a while: it extracts the disc, translates the game and downloads SDL3. If
-   PowerShell says running scripts is disabled, run `Set-ExecutionPolicy -Scope Process Bypass` in the
-   same window first. Other options are [below](#buildps1-options).
+   The first build takes a while: it downloads the build tools, extracts the disc and translates the
+   game. If PowerShell says running scripts is disabled, run `Set-ExecutionPolicy -Scope Process Bypass`
+   in the same window first. Other options are [below](#buildps1-options).
 
 **Playing after that:** in PowerShell,
 ```
@@ -180,7 +180,7 @@ after it in the shortcut's Target.
 ### From a git clone (developers)
 
 The same script works in a clone; by default it checks out and pulls `main` first. In VS Code it is the
-default build task (**Ctrl+Shift+B**). By hand:
+default build task (**Ctrl+Shift+B**). By hand, with Visual Studio 2026 and Python 3.9+:
 
 ```
 python tools/prepare.py

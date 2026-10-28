@@ -124,7 +124,7 @@ Open problems: [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md).
 - Windows 10 / 11, x64
 - Visual Studio 2026 with C/C++ (includes CMake)
 - Python 3.9+ with `pip install pycdlib`
-- Git
+- Git (also needed when building from a release zip: it fetches SDL3 and the widescreen patch)
 - Your own **Street Fighter Alpha 3 MAX** PSP disc image (ISO), US release `ULUS-10062`, placed at
   `imports\psp\Street Fighter Alpha 3 Max.iso` (git-ignored)
 
@@ -140,10 +140,16 @@ cmake --build out --config Release
 out\Release\sfa3r.exe --work work
 ```
 
-Or all in one go: `.\build.ps1`. An ISO elsewhere: `prepare.py path\to\game.iso`, `.\build.ps1 -Iso path`,
+Or all in one go: `.\build.ps1` (from a git clone or from a release's source zip; see below). An ISO elsewhere: `prepare.py path\to\game.iso`, `.\build.ps1 -Iso path`,
 or set `SFA3R_ISO`.
 It checks out and pulls `main` first; `-Here` builds the current branch, and `-ForceWideScreen:$false` (no 16:9 patch), `-NoPull`,
 `-SkipPrepare` and `-Run` do what they say. In VS Code it is the default build task (**Ctrl+Shift+B**).
+
+**From a release:** download the release's *Source code (zip)*, unzip it (for example to
+`C:\sfa3max-recomp`), put your ISO at `imports\psp\Street Fighter Alpha 3 Max.iso` inside it, then in
+PowerShell in that folder run `.\build.ps1 -Run`. Without a `.git` folder the script skips its git
+steps and builds the files as they are. If PowerShell refuses to run the script, run
+`Set-ExecutionPolicy -Scope Process Bypass` in that window first.
 
 `prepare.py` writes `work/` (the disc's files and the analysis) and `build/generated/` (the translated
 C). Both are git-ignored and must never be committed. Re-run it after pulling changes to `tools/`.

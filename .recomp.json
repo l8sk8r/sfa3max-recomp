@@ -1,0 +1,17 @@
+{
+  "$schema": "https://recomp.fyi/schema/v1.json",
+  "game": "Street Fighter Alpha 3 MAX",
+  "system": "PSP",
+  "type": "recomp",
+  "status": "playable",
+  "wikidata": "Q2633628",
+  "original": { "region": "USA", "serial": "ULUS-10062" },
+  "project": "SFA3R: Street Fighter Alpha 3: Recomp",
+  "approach": "Static recompilation of the PSP program to C with its own translator; PSP OS in HLE; SDL3 and OpenGL",
+  "targets": ["Windows"],
+  "toolchain": "Custom",
+  "maintainers": [{ "name": "l8sk8r", "link": "https://github.com/l8sk8r" }],
+  "help": ["Testing with other controllers", "Linux and Steam Deck builds", "Optimisation without changing the timings"],
+  "notes": "Every mode and character of the PSP release, with up to three local players (join-in on select screens, the network modes on one PC), restored L2 / R2 with per-player button configs, widescreen through the SFA3MAX 16:9 patch, everything unlocked and silent saves. Network play is not online.",
+  "tags": ["fighting", "local-multiplayer", "widescreen"]
+}

@@ -1,0 +1,32 @@
+# Game data you own: never committed
+/imports/
+*.iso
+*.cso
+*.chd
+*.bin
+*.cue
+*.img
+*.ccd
+*.sub
+*.zip
+*.7z
+*.gba
+*.pak
+*.arc
+*.elf
+*.prx
+*.BIN
+# Extracted / generated / build output
+/work/
+/work
+/build/
+/build
+/out/
+/generated/
+.vs/
+*.user
+x64/
+Debug/
+Release/
+__pycache__/
+outw/

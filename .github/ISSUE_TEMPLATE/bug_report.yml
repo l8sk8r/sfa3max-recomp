@@ -1,0 +1,41 @@
+name: Bug report
+description: Something does not work as it should
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Shown in the bottom corner of OPTION MODE > EX. SETTING
+      placeholder: V1.0.0
+    validations:
+      required: true
+  - type: input
+    id: mode
+    attributes:
+      label: Mode
+      placeholder: Dramatic Battle, Arcade, NETWORK > VS MODE, ...
+  - type: input
+    id: controllers
+    attributes:
+      label: Controllers
+      placeholder: Keyboard + 2 DualSense, Xbox Series pad, ...
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to make it happen
+      placeholder: "1. ...\n2. ...\n3. ..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What happened, and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: Paste the end of work/sfa3r.log, or attach the file
+      render: text

@@ -6,7 +6,7 @@
 | 2 | **Local players come from feeding more controllers into the PSP game**, not from another version. | The missing second player is a hardware limit (one PSP, one pad); the game already runs several fighters and has versus logic behind its wireless layer. |
 | 3 | **Western names and English throughout.** | The US disc already uses them; nothing to patch. |
 | 4 | **Everything unlocked from the start**, by holding the game's own unlock flags on. | Every character and mode available without grinding. |
-| 5 | **Target: Windows x64, CMake. Players build with LLVM-MinGW, CMake, Ninja and Python that `build.ps1` downloads; Visual Studio 2026 is the developers' option.** | Nothing to install to play; the same code builds with MSVC, clang and gcc. |
+| 5 | **Target: Windows x64, CMake. `build.ps1` uses Visual Studio, CMake, Python when installed and downloads LLVM-MinGW, CMake, Ninja, Python otherwise.** | Nothing to install to play, the developers' own tools when they have them; the same code builds with MSVC, clang and gcc. |
 | 6 | **Our own translator**, written for this game. | The program needs plain MIPS plus a few Allegrex extras, so a small translator is enough, and other recompilers' licences would bind the project. |
 | 7 | **Widescreen is the SFA3MAX 16:9 patch (Rickow) as a setting.** `prepare.py` fetches it and records what it changes; the translation keeps both meanings and SCREEN SIZE > WIDE FORCED picks one at run time. | Proven in PPSSPP; no separate build; the patch itself is never committed. |
 | 8 | **Notes on the other versions' differences are kept** (VERSION_DIFFERENCES.md). | For possible later play modes (other versions' rules). |

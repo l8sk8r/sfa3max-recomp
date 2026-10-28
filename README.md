@@ -121,15 +121,23 @@ Open problems: [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md).
 
 ## Prerequisites
 
+Required:
+
 - Windows 10 (1803 or later) or 11, x64
 - Your own **Street Fighter Alpha 3 MAX** PSP disc image (ISO), US release `ULUS-10062`, placed at
   `imports\psp\Street Fighter Alpha 3 Max.iso` (git-ignored)
 - An internet connection for the first build
 
-Nothing else needs installing. The first build downloads its own build tools into `.tools\` inside the
-folder (about 300 MB: the LLVM-MinGW compiler, CMake, Ninja, and Python if you don't have 3.9 or later),
-plus SDL3 and the SFA3MAX 16:9 patch (Rickow, MIT) for WIDE FORCED. Later builds reuse them. To remove
-everything, delete the folder.
+Recommended for development (`build.ps1` uses them when they are installed, and downloads what is
+missing into `.tools\` inside the folder, about 300 MB the first time):
+
+- Visual Studio 2026 (or 2022) with *Desktop development with C++*, which includes CMake
+  (otherwise: the LLVM-MinGW compiler, CMake and Ninja are downloaded)
+- Python 3.9 or later (otherwise: Python is downloaded)
+- Git, to work from a clone
+
+The build also downloads SDL3 and the SFA3MAX 16:9 patch (Rickow, MIT) for WIDE FORCED. All the
+details, options and troubleshooting: [docs/BUILDING.md](docs/BUILDING.md).
 
 ## Building
 
@@ -153,7 +161,7 @@ everything, delete the folder.
    ```
    The first build takes a while: it downloads the build tools, extracts the disc and translates the
    game. If PowerShell says running scripts is disabled, run `Set-ExecutionPolicy -Scope Process Bypass`
-   in the same window first. Other options are [below](#buildps1-options).
+   in the same window first. Other options: [docs/BUILDING.md](docs/BUILDING.md).
 
 **Playing after that:** in PowerShell,
 ```
@@ -166,31 +174,11 @@ after it in the shortcut's Target.
 **Updating:** download the new release's Source code (zip) and copy what is in its folder over your
 `sfa3max-recomp` folder (your ISO, `work\` and saves stay), then run `.\build.ps1 -Run` again.
 
-### build.ps1 options
+### Options and developers
 
-| Option | |
-|---|---|
-| `-Run` | start the game after a successful build |
-| `-Iso path` | the ISO, if it is not at `imports\psp\Street Fighter Alpha 3 Max.iso` (or set `SFA3R_ISO`) |
-| `-ForceWideScreen:$false` | build without the 16:9 patch (no WIDE FORCED) |
-| `-SkipPrepare` | reuse the extracted disc and translated code from the last build |
-| `-Config Debug` | a debug build (`out\Debug\sfa3r.exe`) |
-| `-Here`, `-NoPull` | in a git clone: build the current branch / do not pull first (by default it checks out and pulls `main`) |
-
-### From a git clone (developers)
-
-The same script works in a clone; by default it checks out and pulls `main` first. In VS Code it is the
-default build task (**Ctrl+Shift+B**). By hand, with Visual Studio 2026 and Python 3.9+:
-
-```
-python tools/prepare.py
-cmake -B out -G "Visual Studio 18 2026" -A x64
-cmake --build out --config Release
-out\Release\sfa3r.exe --work work
-```
-
-`prepare.py` writes `work/` (the disc's files and the analysis) and `build/generated/` (the translated
-C). Both are git-ignored and must never be committed. Re-run it after pulling changes to `tools/`.
+`build.ps1`'s options (`-Iso`, `-ForceWideScreen:$false`, `-Toolchain`, `-SkipPrepare`, `-Config`, and
+`-Here` / `-NoPull` in a git clone), which tools it picks, building by hand and on Linux are in
+[docs/BUILDING.md](docs/BUILDING.md).
 
 ## Playing
 
@@ -250,7 +238,7 @@ A log is written to `work/sfa3r.log`.
 | `tools/` | `prepare.py` (the whole pipeline), `psp_elf.py`, `psp_imports.py`, `psp_analyze.py`, `psp_recomp.py`; `data/hooks.txt` lists the game functions replaced by native code |
 | `src/runtime/` | the native runtime: memory, threads, files, graphics, sound, input, and SFA3R's changes to the game |
 | `third_party/` | ATRAC3/ATRAC3+ decoder from PPSSPP / FFmpeg (LGPL 2.1+), libkirk |
-| `docs/` | [architecture](docs/ARCHITECTURE.md), [decisions](docs/DECISIONS.md), [program map](docs/PSP_PROGRAM_MAP.md), [players](docs/PLAYERS.md), [controllers](docs/CONTROLLERS.md), [buttons](docs/PLAYER_CONFIG.md), [saves](docs/SAVES.md), [other versions](docs/VERSION_DIFFERENCES.md), [known issues](docs/KNOWN_ISSUES.md) |
+| `docs/` | [building](docs/BUILDING.md), [architecture](docs/ARCHITECTURE.md), [decisions](docs/DECISIONS.md), [program map](docs/PSP_PROGRAM_MAP.md), [players](docs/PLAYERS.md), [controllers](docs/CONTROLLERS.md), [buttons](docs/PLAYER_CONFIG.md), [saves](docs/SAVES.md), [other versions](docs/VERSION_DIFFERENCES.md), [known issues](docs/KNOWN_ISSUES.md) |
 
 ## Contributing
 

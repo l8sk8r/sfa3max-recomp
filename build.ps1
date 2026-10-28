@@ -3,21 +3,23 @@
     One-shot build of sfa3r.exe: extract and translate your disc, then compile.
 
 .DESCRIPTION
-    Nothing needs installing: the first time, the script downloads its own build tools into .tools\
-    (about 300 MB: the LLVM-MinGW compiler, CMake, Ninja and, if Python 3.9+ is not installed,
-    Python), each checked against a known SHA-256 where one is pinned. Then it runs:
+    Uses the build tools you have installed, and downloads the ones you don't into .tools\ (once;
+    each pinned to a release and checked against its SHA-256 where one is known):
+        compiler  Visual Studio 2026 / 2022 with C++, if installed; otherwise LLVM-MinGW (with Ninja)
+        CMake     Visual Studio's own, or one on PATH, or downloaded
+        Ninja     one on PATH, or downloaded (LLVM-MinGW builds only)
+        Python    3.9+ on PATH, or downloaded
+    Then it runs:
         python tools/prepare.py      (extract the ISO, translate the game to C)
         cmake configure + build      (out\Release\sfa3r.exe)
-    and stops at the first step that fails.
-
-    -VisualStudio builds with Visual Studio 2026 instead (for developers who have it).
-    In a git clone it also checks out and pulls main first, unless -Here / -NoPull.
+    and stops at the first step that fails. In a git clone it first checks out and pulls main,
+    unless -Here / -NoPull. More: docs/BUILDING.md.
 
 .EXAMPLE
-    .\build.ps1 -Run             # build and play (ISO in imports\psp\)
+    .\build.ps1 -Run                      # build and play (ISO in imports\psp\)
     .\build.ps1 -ForceWideScreen:$false   # without the SFA3MAX 16:9 patch (no WIDE FORCED)
-    .\build.ps1 -VisualStudio    # use Visual Studio 2026 instead of the downloaded tools
-    .\build.ps1 -Here            # git clone: build the branch you are on (no checkout, still pulls)
+    .\build.ps1 -Toolchain LLVM           # the downloaded LLVM-MinGW even if Visual Studio is installed
+    .\build.ps1 -Here                     # git clone: build the branch you are on (no checkout, still pulls)
 #>
 param(
     [string]$Iso = "",          # your ISO, if not imports\psp\Street Fighter Alpha 3 Max.iso (or SFA3R_ISO)
@@ -26,7 +28,8 @@ param(
     [switch]$NoPull,            # git clone: skip git pull
     [switch]$ForceWideScreen = $true,   # include the 16:9 patch (SCREEN SIZE > WIDE FORCED); $false leaves it out
     [switch]$SkipPrepare,       # reuse the existing work/ and build/generated/
-    [switch]$VisualStudio,      # build with Visual Studio 2026 rather than the downloaded tools
+    [ValidateSet("Auto", "VisualStudio", "LLVM")]
+    [string]$Toolchain = "Auto",   # Auto: Visual Studio if installed, else LLVM-MinGW
     [ValidateSet("Release", "Debug", "RelWithDebInfo")]
     [string]$Config = "Release",
     [switch]$Run                # start the game after a successful build
@@ -98,9 +101,39 @@ function Find-Python {
         $cmd = Get-Command $exe -ErrorAction SilentlyContinue
         if (-not $cmd -or $cmd.Source -like "*WindowsApps*") { continue }   # (the Store's stand-in, not Python)
         $v = & $exe -c "import sys; print(sys.version_info >= (3, 9))" 2>$null
-        if ($v -eq "True") { return $cmd.Source }
+        if ($v -eq "True") { Write-Host "  Python: installed ($($cmd.Source))"; return $cmd.Source }
     }
-    return (Join-Path (Get-Tool "python") "python.exe")
+    $p = Join-Path (Get-Tool "python") "python.exe"; Write-Host "  Python: .tools\python"; return $p
+}
+
+# Visual Studio with the C++ tools: @{ Path; Generator } or $null
+function Find-VisualStudio {
+    if (-not ${env:ProgramFiles(x86)}) { return $null }
+    $vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"
+    if (-not (Test-Path $vswhere)) { return $null }
+    $path = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+    $ver = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationVersion
+    if (-not $path -or -not $ver) { return $null }
+    $major = [int]($ver.Split(".")[0])
+    $years = @{ 17 = "2022"; 18 = "2026" }
+    if (-not $years.ContainsKey($major)) { return $null }
+    return @{ Path = $path; Generator = "Visual Studio $major $($years[$major])" }
+}
+
+# a CMake of at least 3.20: Visual Studio's own (when building with it), one on PATH, or downloaded
+function Find-CMake($vs) {
+    if ($vs) {
+        $own = Join-Path $vs.Path "Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
+        if (Test-Path $own) { Write-Host "  CMake: Visual Studio's"; return (Split-Path $own) }
+    }
+    $cmd = Get-Command cmake -ErrorAction SilentlyContinue
+    if ($cmd) {
+        $line = (& cmake --version | Select-Object -First 1)
+        if ($line -match "(\d+)\.(\d+)" -and ([int]$Matches[1] -gt 3 -or ([int]$Matches[1] -eq 3 -and [int]$Matches[2] -ge 20))) {
+            Write-Host "  CMake: installed ($($cmd.Source))"; return (Split-Path $cmd.Source)
+        }
+    }
+    $d = Join-Path (Get-Tool "cmake") "bin"; Write-Host "  CMake: .tools\cmake"; return $d
 }
 
 $timer = [System.Diagnostics.Stopwatch]::StartNew()
@@ -118,17 +151,26 @@ if (-not $Here) {
 }
 if (-not $NoPull) { Step "git pull" { git pull } }
 
-# ---------------------------------------------------------------- tools
-if ($VisualStudio) {
-    $python = Find-Python
-} else {
-    Step "build tools (.tools\)" {
-        $script:llvm = Get-Tool "llvm"; $script:cmakeDir = Get-Tool "cmake"; $script:ninjaDir = Get-Tool "ninja"
-        $script:python = Find-Python
-        $global:LASTEXITCODE = 0
-    }
-    $env:PATH = "$llvm\bin;$cmakeDir\bin;$ninjaDir;$env:PATH"
+# ---------------------------------------------------------------- tools: installed ones, or downloaded
+Write-Host ""
+Write-Host "==> build tools" -ForegroundColor Cyan
+$vs = if ($Toolchain -ne "LLVM") { Find-VisualStudio } else { $null }
+if ($Toolchain -eq "VisualStudio" -and -not $vs) {
+    Write-Host "Visual Studio 2026 or 2022 with 'Desktop development with C++' was not found." -ForegroundColor Red
+    exit 1
 }
+if ($vs) {
+    Write-Host "  compiler: $($vs.Generator) ($($vs.Path))"
+    $paths = @(Find-CMake $vs)
+} else {
+    $llvm = Get-Tool "llvm"; Write-Host "  compiler: LLVM-MinGW (.tools\llvm-mingw)"
+    $paths = @("$llvm\bin", (Find-CMake $null))
+    $ninja = Get-Command ninja -ErrorAction SilentlyContinue
+    if ($ninja) { Write-Host "  Ninja: installed ($($ninja.Source))" }
+    else { $paths += (Get-Tool "ninja"); Write-Host "  Ninja: .tools\ninja" }
+}
+$python = Find-Python
+$env:PATH = (($paths | Where-Object { $_ }) -join ";") + ";$env:PATH"
 
 # ---------------------------------------------------------------- prepare, configure, build
 if (-not $SkipPrepare) {
@@ -139,15 +181,15 @@ if (-not $SkipPrepare) {
 }
 
 # a build folder made by the other toolchain is started again
-$generator = if ($VisualStudio) { "Visual Studio 18 2026" } else { "Ninja" }
+$generator = if ($vs) { $vs.Generator } else { "Ninja" }
 $cache = Join-Path $PSScriptRoot "out\CMakeCache.txt"
 if ((Test-Path $cache) -and -not (Select-String -Path $cache -SimpleMatch -Quiet "CMAKE_GENERATOR:INTERNAL=$generator")) {
     Write-Host "  out\ was made by another toolchain: starting it again" -ForegroundColor Yellow
     Remove-Item (Join-Path $PSScriptRoot "out") -Recurse -Force
 }
 
-if ($VisualStudio) {
-    Step "cmake configure (Visual Studio)" { cmake -B out -G $generator -A x64 }
+if ($vs) {
+    Step "cmake configure ($generator)" { cmake -B out -G $generator -A x64 }
     Step "cmake build ($Config)" { cmake --build out --config $Config }
 } else {
     Step "cmake configure (LLVM-MinGW)" {

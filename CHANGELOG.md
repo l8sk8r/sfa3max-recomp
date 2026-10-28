@@ -6,9 +6,10 @@ Each version's section here becomes its release notes. To release: in the pull r
 
 ## 1.1.0
 
-- Nothing to install to build: `build.ps1` downloads its own compiler (LLVM-MinGW), CMake, Ninja and,
-  if needed, Python. Visual Studio, Git and pip are no longer needed (`-VisualStudio` still uses
-  Visual Studio).
+- Nothing to install to build: `build.ps1` uses the build tools you have (Visual Studio, CMake,
+  Python) and downloads the ones you don't (LLVM-MinGW, CMake, Ninja, Python). Git and pip are no
+  longer needed.
+- A new [building guide](docs/BUILDING.md) with every option.
 
 ## 1.0.3
 

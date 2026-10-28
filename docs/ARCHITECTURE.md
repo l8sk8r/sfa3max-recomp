@@ -83,8 +83,8 @@ Possible next steps: texture upscaling, integer-scaled presentation of the 480×
 
 ## 6. Build and test
 
-- CMake. `build.ps1` builds with LLVM-MinGW (clang) and Ninja, which it downloads; Visual Studio 2026
-  (`-VisualStudio`) and gcc / clang on Linux build it too. The generated C is about 19 MB in 38 files.
+- CMake. `build.ps1` builds with Visual Studio 2026 / 2022 when it is installed, otherwise with LLVM-MinGW
+  (clang) and Ninja, which it downloads (docs/BUILDING.md); gcc / clang on Linux build it too. The generated C is about 19 MB in 38 files.
 - Scripted headless runs (`--headless --fast --input ... --dump ...`) of every mode, compared screen by
   screen, check that changes leave the rest of the game alone.
 - PPSSPP is the reference for the PSP's behaviour.

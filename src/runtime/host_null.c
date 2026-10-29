@@ -2,6 +2,7 @@
 #include "host.h"
 #ifndef SFA3MR_SDL
 void host_set_work(const char *work) { (void)work; }
+void host_set_pad_trace(int on) { (void)on; }
 int  host_init(int headless, int want_gl) { (void)headless; (void)want_gl; return 1; }
 HostGetProc host_gl_getproc(void) { return 0; }
 void host_gl_swap(void) {}

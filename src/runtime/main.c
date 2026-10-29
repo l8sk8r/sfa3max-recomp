@@ -10,6 +10,7 @@
  *   --scale N    GPU internal resolution, N x 480x272 (1-8; default: covers the monitor)
  *   --p2 / --p3 human|cpu|auto   who controls fighters 2 and 3 (auto: human if gamepad 2/3 is connected)
  *   --pads LIST                  the gamepads (1-4) shown as plugged in on the MODE MENU's pad icons (tests)
+ *   --pad-trace  log every change of a gamepad's buttons and left stick (controller problems)
  *   --watch LO-HI  log loads/stores to that range by game address (build with -DSFA3MR_WATCH=ON)
  *   --watch-from N start watching at frame N
  *   --watch-pc PC  only report accesses made by the instruction at PC (repeatable, up to 16)
@@ -316,6 +317,7 @@ int main(int argc, char **argv) {
             extern int rt_human[3]; int k = argv[i][3] - '1'; const char *v = argv[++i];
             rt_human[k] = !strcmp(v, "human") ? 1 : !strcmp(v, "cpu") ? 0 : -1;
         }
+        else if (!strcmp(argv[i], "--pad-trace")) host_set_pad_trace(1);
         else if (!strcmp(argv[i], "--pads") && i + 1 < argc) {       /* e.g. 124: gamepads taken as plugged in for the pad icons */
             extern int rt_pads_forced; rt_pads_forced = 0;
             for (const char *p = argv[++i]; *p; p++) if (*p >= '1' && *p <= '4') rt_pads_forced |= 1 << (*p - '1');

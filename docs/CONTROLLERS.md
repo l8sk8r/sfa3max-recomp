@@ -1,7 +1,7 @@
 # Controllers
 
 SFA3MR reads the keyboard and up to four gamepads through SDL3. SDL drives Xbox / XInput pads,
-DualSense and DualShock 4 and Switch Pro controllers itself; for the rest it reads the community
+DualSense and DualShock 4, Switch Pro and Switch 2 Pro controllers itself; for the rest it reads the community
 database [SDL_GameControllerDB](https://github.com/mdqinc/SDL_GameControllerDB) (zlib licence), which
 ships next to `sfa3mr.exe` as `gamecontrollerdb.txt`. Tested so far on Windows 11: four DualSense pads
 (Switch Pro and Switch 2 Pro support is new in 1.1.3); reports for other controllers are welcome.
@@ -39,7 +39,9 @@ yellow on the right.
 | Select | Backspace | Back | View | Create |
 
 The left stick works as an eight-way stick: nothing until it is pushed about 40% of the way, then
-the nearest of the eight directions, so a stick pushed left does not slip into a crouch. The
+the nearest of the eight directions, so a stick pushed left does not slip into a crouch. A direction
+stays on until the stick is clearly in another one (about 7 degrees past the edge) or back under
+about 30%, so a stick held between two directions does not flicker. The
 triggers count as pressed past about half way. What each button does in a
 fight is set per player in OPTION MODE > PLAYER CONFIG ([PLAYER_CONFIG.md](PLAYER_CONFIG.md)), and from
 the pause menu's BUTTON CONFIG.
@@ -55,13 +57,22 @@ switches full screen, **Esc** quits. No gamepad button does these.
    [SDL2 Gamepad Tool](https://generalarcade.com/gamepadtool/), or copy the pad's line from a newer
    `gamecontrollerdb.txt`) and put it in **`work\gamecontrollerdb.txt`**. That file is read after the
    shipped one, and its lines win, so no rebuild is needed.
-3. If Steam is running, Steam Input may be taking the pad over: turn it off for SFA3MR, or close
-   Steam, and try again.
+3. If Steam is running, Steam Input may be reading the pad at the same time, which can make it lag
+   or send stray directions (Switch pads especially): close Steam, or turn off Steam Input for that
+   kind of pad (Steam > Settings > Controller), and try again.
+4. Still wrong: start the game with **`--pad-trace`**
+   (`out\Release\sfa3mr.exe --work work --pad-trace`). Every change of each pad's buttons and left
+   stick is then logged (`pad 1: buttons ... stick x,y`), which shows what the game was given and
+   when.
 
 Nintendo pads: the buttons go by position, not label, so the bottom button (B on a Nintendo pad) is
-Cross and the right one (A) is Circle, as on a PlayStation pad. On Windows the **Switch 2 Pro
-controller** is read as an ordinary controller through the database (SDL's own driver for it needs a
-USB library Windows does not have).
+Cross and the right one (A) is Circle, as on a PlayStation pad.
+
+**Switch 2 Pro controller:** plug it in with a USB cable; Bluetooth does not work yet (SDL has no
+Bluetooth support for it). The pad sends nothing until it is sent a start-up message over USB, which
+SDL does through libusb (built into SFA3MR; Windows gives the pad the WinUSB driver itself, nothing to
+install). Only one program can talk to it that way at a time, so **close Steam** (or any other
+program using the pad) before starting the game; otherwise the pad is seen but no button works.
 
 ## What a plugged-in pad does
 

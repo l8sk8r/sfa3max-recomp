@@ -67,7 +67,8 @@ Build errors from Visual Studio show up in the Problems panel.
 3. **`python tools/prepare.py`:** reads your ISO, extracts the disc's files into `work\`, downloads and
    applies the widescreen patch as an overlay (unless `-ForceWideScreen:$false`), analyses the game
    program and translates it to C in `build\generated\` (about 19 MB).
-4. **CMake configure and build** in `out\`: downloads SDL3 (once) and compiles everything into
+4. **CMake configure and build** in `out\`: downloads SDL3 and libusb (once; libusb is for SDL's
+   Switch 2 Pro driver) and compiles everything into
    `out\Release\sfa3mr.exe` (or `out\Debug\...` with `-Config Debug`). If `out\` was made by the other
    toolchain, it is started again.
 5. **`-Run`:** starts the game with `--work work`.

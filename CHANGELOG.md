@@ -7,9 +7,11 @@ Each version's section here becomes its release notes. To release: in the pull r
 ## 1.1.3
 
 - Controllers: the community gamepad database (SDL_GameControllerDB) is now read, plus your own
-  `work\gamecontrollerdb.txt`; the Switch 2 Pro controller is recognised on Windows; the left stick
-  works as an eight-way stick with a dead zone, so it no longer slips into crouches or menu presses;
-  each pad's name and mapping are logged.
+  `work\gamecontrollerdb.txt`; the left stick works as an eight-way stick with a dead zone and some
+  give at its edges, so it no longer slips into crouches or menu presses; each pad's name, connection
+  and mapping are logged, and `--pad-trace` logs every input change.
+- Switch 2 Pro controller over USB: SDL's driver for it is now built in (with libusb, LGPL-2.1,
+  downloaded and built with the game). Close Steam while playing with it.
 
 ## 1.1.2
 

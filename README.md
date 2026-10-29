@@ -84,7 +84,7 @@ Why I wish I hadn't:
 ### What I've tested with so far
 
 - Four DualSense pads ([controller support](docs/CONTROLLERS.md)).
-- A laptop with two GPUs (there's no GPU switching yet).
+- A laptop with two GPUs (the game now asks the driver for the fast one).
 - Windows 11 only; the Windows build is the only one so far.
 
 ### What's broken

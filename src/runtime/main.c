@@ -32,6 +32,13 @@
 #include "host.h"
 #include "net_link.h"
 
+#ifdef _WIN32
+/* Laptops with two GPUs: these exports ask the NVIDIA (Optimus) and AMD (PowerXpress) drivers to run
+ * the game on the fast GPU rather than the power-saving one. */
+__declspec(dllexport) unsigned long NvOptimusEnablement = 1;
+__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+#endif
+
 int rt_trace;
 static FILE *log_file;
 

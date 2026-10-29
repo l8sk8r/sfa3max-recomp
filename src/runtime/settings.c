@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+int rt_vsync = 1;                             /* [screen setting] vsync: wait for the monitor (no tearing); ON when missing */
 int rt_join_in[3] = { 0, 0, 0 }, rt_couch_coop = 1;   /* EX. SETTING: 1P / 2P / 3P JOIN-IN, HUMAN (1) or CPU (0): docs/PLAYERS.md */
 extern int rt_l2[4], rt_r2[4];
 extern uint8_t rt_p4_config[20];
@@ -201,6 +202,7 @@ void settings_load(void) {
                 continue;
             }
             if (!strcmp(key, "couch_coop")) { rt_couch_coop = is_on(val); continue; }
+            if (!strcmp(key, "vsync")) { rt_vsync = is_on(val); continue; }
             if ((!strncmp(key, "l2_p", 4) || !strncmp(key, "r2_p", 4)) && key[4] >= '1' && key[4] <= '4' && !key[5]) {
                 int v = atoi(val); if (v >= 0 && v < N_ATTACKS) set_button(key[4] - '1', key[0] == 'l' ? 7 : 8, v);
                 continue;
@@ -259,7 +261,8 @@ static void cfg_body(FILE *f) {
     fprintf(f, "\n[ex setting]\n");
     for (int k = 0; k < 3; k++) { char l[48]; snprintf(l, sizeof l, "p%d_join_in=%s", k + 1, v_human[!!rt_join_in[k]]); fprintf(f, "%-24s # HUMAN: pad %d plays a fighter nobody started with; CPU: the computer does\n", l, k + 1); }
     fprintf(f, "couch_coop=%s\n", off_on[!!rt_couch_coop]);
-    write_fields(f, o, "progress", 1);
+    write_fields(f, o, "progress", 1);         /* ends with [screen setting] */
+    { char l[48]; snprintf(l, sizeof l, "vsync=%s", off_on[!!rt_vsync]); fprintf(f, "%-24s # ON: wait for the monitor, no tearing; OFF: never wait\n", l); }
     for (int p = 0; p < 4; p++) {
         const uint8_t *c = p == 3 ? rt_p4_config : o ? o + 20 * p : NULL;
         fprintf(f, "\n[p%d config]\n", p + 1);

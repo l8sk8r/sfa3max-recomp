@@ -4,6 +4,12 @@ Each version's section here becomes its release notes. To release: in the pull r
 `VERSION` and add its section below; merging into `main` tags it and publishes the release
 (`.github/workflows/release.yml`).
 
+## 1.1.3
+
+- VSYNC: the picture waits for the monitor, so no more tearing. On by default; `vsync=OFF` under
+  `[screen setting]` in `work\sfa3mr.cfg` turns it off. The game still runs at its own 59.94 Hz on
+  120 / 144 Hz monitors.
+
 ## 1.1.2
 
 - Fixes the build in Windows PowerShell 5.1, which stopped at the first note a build step printed.

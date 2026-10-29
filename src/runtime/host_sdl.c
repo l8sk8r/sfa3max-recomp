@@ -47,7 +47,14 @@ int host_init(int headless, int want_gl) {
         if (win) glctx = SDL_GL_CreateContext(win);
         if (glctx) {
             SDL_GL_MakeCurrent(win, glctx);
-            SDL_GL_SetSwapInterval(0);              /* the runtime paces itself to 59.94 Hz */
+            /* VSYNC (SCREEN SETTING vsync, default ON): the swap waits for the monitor, so no tearing. The
+               runtime still paces the game to 59.94 Hz itself, so a 120 / 144 Hz monitor does not
+               speed it up; adaptive vsync (-1) first, so a late frame tears instead of waiting a
+               whole refresh */
+            extern int rt_vsync;
+            if (!rt_vsync || !SDL_GL_SetSwapInterval(-1)) SDL_GL_SetSwapInterval(rt_vsync ? 1 : 0);
+            int si = 0; SDL_GL_GetSwapInterval(&si);
+            rt_log("GL: vsync %s (swap interval %d)", rt_vsync ? "on" : "off", si);
             open_audio();
             return 1;
         }
@@ -59,7 +66,7 @@ int host_init(int headless, int want_gl) {
     if (!win) return 0;
     ren = SDL_CreateRenderer(win, NULL);
     if (!ren) return 0;
-    SDL_SetRenderVSync(ren, 0);
+    { extern int rt_vsync; SDL_SetRenderVSync(ren, rt_vsync ? 1 : 0); }
     SDL_SetRenderLogicalPresentation(ren, 480, 272, SDL_LOGICAL_PRESENTATION_LETTERBOX);
     tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, 480, 272);
     SDL_SetTextureScaleMode(tex, SDL_SCALEMODE_NEAREST);

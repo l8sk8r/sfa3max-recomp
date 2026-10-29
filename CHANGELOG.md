@@ -4,6 +4,10 @@ Each version's section here becomes its release notes. To release: in the pull r
 `VERSION` and add its section below; merging into `main` tags it and publishes the release
 (`.github/workflows/release.yml`).
 
+## 1.1.2
+
+- Fixes the build in Windows PowerShell 5.1, which stopped at the first note a build step printed.
+
 ## 1.1.1
 
 - Laptops with two GPUs (NVIDIA Optimus, AMD switchable graphics) run the game on the fast one.

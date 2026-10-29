@@ -1,9 +1,10 @@
 # Controllers
 
-SFA3MR reads the keyboard and up to four gamepads through SDL3. Any controller SDL3 knows as a
-gamepad should work: Xbox / XInput pads, DualSense and DualShock 4, Switch Pro, and the many others in
-SDL's controller database. So far it has been tested with four DualSense pads on Windows 11; reports
-for other controllers are welcome.
+SFA3MR reads the keyboard and up to four gamepads through SDL3. SDL drives Xbox / XInput pads,
+DualSense and DualShock 4 and Switch Pro controllers itself; for the rest it reads the community
+database [SDL_GameControllerDB](https://github.com/mdqinc/SDL_GameControllerDB) (zlib licence), which
+ships next to `sfa3mr.exe` as `gamecontrollerdb.txt`. Tested so far on Windows 11: four DualSense pads
+(Switch Pro and Switch 2 Pro support is new in 1.1.3); reports for other controllers are welcome.
 
 ## Who is which player
 
@@ -37,12 +38,30 @@ yellow on the right.
 | Start | Enter | Start | Menu | Options |
 | Select | Backspace | Back | View | Create |
 
-The left stick and the triggers count as pressed past about half way. What each button does in a
+The left stick works as an eight-way stick: nothing until it is pushed about 40% of the way, then
+the nearest of the eight directions, so a stick pushed left does not slip into a crouch. The
+triggers count as pressed past about half way. What each button does in a
 fight is set per player in OPTION MODE > PLAYER CONFIG ([PLAYER_CONFIG.md](PLAYER_CONFIG.md)), and from
 the pause menu's BUTTON CONFIG.
 
 Keyboard only: **F2** goes back to the MODE MENU at once without saving, **F11** or **Alt+Enter**
 switches full screen, **Esc** quits. No gamepad button does these.
+
+## A pad that is not recognised, or has the wrong buttons
+
+1. Look in `work\sfa3mr.log`: each pad is logged when it is plugged in, with its name, type, GUID
+   and the mapping in use (`gamepad: ...`). No line at all means SDL did not see it as a gamepad.
+2. Make a mapping line for it (for example with the
+   [SDL2 Gamepad Tool](https://generalarcade.com/gamepadtool/), or copy the pad's line from a newer
+   `gamecontrollerdb.txt`) and put it in **`work\gamecontrollerdb.txt`**. That file is read after the
+   shipped one, and its lines win, so no rebuild is needed.
+3. If Steam is running, Steam Input may be taking the pad over: turn it off for SFA3MR, or close
+   Steam, and try again.
+
+Nintendo pads: the buttons go by position, not label, so the bottom button (B on a Nintendo pad) is
+Cross and the right one (A) is Circle, as on a PlayStation pad. On Windows the **Switch 2 Pro
+controller** is read as an ordinary controller through the database (SDL's own driver for it needs a
+USB library Windows does not have).
 
 ## What a plugged-in pad does
 

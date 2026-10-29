@@ -232,7 +232,7 @@ A log is written to `work/sfa3mr.log`.
 |---|---|
 | `tools/` | `prepare.py` (the whole pipeline), `psp_elf.py`, `psp_imports.py`, `psp_analyze.py`, `psp_recomp.py`; `data/hooks.txt` lists the game functions replaced by native code |
 | `src/runtime/` | the native runtime: memory, threads, files, graphics, sound, input, and SFA3MR's changes to the game |
-| `third_party/` | ATRAC3/ATRAC3+ decoder from PPSSPP / FFmpeg (LGPL 2.1+), libkirk |
+| `third_party/` | ATRAC3/ATRAC3+ decoder from PPSSPP / FFmpeg (LGPL 2.1+), libkirk, SDL_GameControllerDB (zlib) |
 | `docs/` | [building](docs/BUILDING.md), [architecture](docs/ARCHITECTURE.md), [decisions](docs/DECISIONS.md), [program map](docs/PSP_PROGRAM_MAP.md), [players](docs/PLAYERS.md), [controllers](docs/CONTROLLERS.md), [buttons](docs/PLAYER_CONFIG.md), [saves](docs/SAVES.md), [other versions](docs/VERSION_DIFFERENCES.md), [known issues](docs/KNOWN_ISSUES.md) |
 
 ## Contributing

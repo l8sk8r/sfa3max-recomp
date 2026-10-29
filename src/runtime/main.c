@@ -355,6 +355,7 @@ int main(int argc, char **argv) {
     rt_log("loaded program image: %ld bytes at 08804000", n);
     rt_reserve(USER_LO, (0x08804000u + (uint32_t)n + 0xFFFF) & ~0xFFFFu, "program");
 
+    host_set_work(work);
     if (!host_init(headless, !want_soft)) rt_fatal("could not open the window (SDL)");
     if (!want_soft) {
         HostGetProc gp = headless ? host_headless_gl() : host_gl_getproc();

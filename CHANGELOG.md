@@ -4,6 +4,13 @@ Each version's section here becomes its release notes. To release: in the pull r
 `VERSION` and add its section below; merging into `main` tags it and publishes the release
 (`.github/workflows/release.yml`).
 
+## 1.1.3
+
+- Controllers: the community gamepad database (SDL_GameControllerDB) is now read, plus your own
+  `work\gamecontrollerdb.txt`; the Switch 2 Pro controller is recognised on Windows; the left stick
+  works as an eight-way stick with a dead zone, so it no longer slips into crouches or menu presses;
+  each pad's name and mapping are logged.
+
 ## 1.1.2
 
 - Fixes the build in Windows PowerShell 5.1, which stopped at the first note a build step printed.

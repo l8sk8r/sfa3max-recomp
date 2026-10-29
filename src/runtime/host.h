@@ -2,6 +2,7 @@
 #pragma once
 #include <stdint.h>
 
+void host_set_work(const char *work);                          /* before host_init: where a user gamecontrollerdb.txt may be */
 int  host_init(int headless, int want_gl);                     /* 0 on failure */
 typedef void *(*HostGetProc)(const char *);
 HostGetProc host_gl_getproc(void);                             /* OpenGL 3.3 core context's loader, or NULL */

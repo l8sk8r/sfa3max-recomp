@@ -67,6 +67,9 @@ if(SFA3MR_SDL)
   FetchContent_MakeAvailable(SDL3)
   target_link_libraries(sfa3mr PRIVATE SDL3::SDL3-static)
   target_compile_definitions(sfa3mr PRIVATE SFA3MR_SDL)
+  # gamepad mappings (SDL_GameControllerDB, zlib): next to the exe, read at start
+  add_custom_command(TARGET sfa3mr POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_SOURCE_DIR}/third_party/SDL_GameControllerDB/gamecontrollerdb.txt" "$<TARGET_FILE_DIR:sfa3mr>/gamecontrollerdb.txt")
 endif()
 
 if(WIN32)

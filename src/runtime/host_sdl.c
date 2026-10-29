@@ -4,6 +4,7 @@
  *                   Q = L   W = R      Enter = start   Backspace = select
  *                   F11 or Alt+Enter = full screen   F2 = back to the MODE MENU (no save)   Esc = quit
  * Gamepads: the first pad joins player 1 (alongside the keyboard), the next ones players 2-4.
+ *   Mappings: SDL's own, SDL_GameControllerDB next to the exe, then <work>/gamecontrollerdb.txt.
  *   south = cross, east = circle, west = square, north = triangle, shoulders = L/R,
  *   d-pad or left stick = directions, start/back = start/select.
  */
@@ -11,6 +12,7 @@
 #include "host.h"
 #include <SDL3/SDL.h>
 void rt_log(const char *fmt, ...);
+#include <stdio.h>
 #include <string.h>
 
 static SDL_Window *win;
@@ -30,10 +32,33 @@ static void open_audio(void) {
     }
 }
 
+/* Gamepad mappings: SDL knows the common pads itself (and drives Switch, PlayStation and Xbox pads
+ * directly); for the rest it reads the community database, SDL_GameControllerDB
+ * (third_party/SDL_GameControllerDB, copied next to the exe), and then <work>/gamecontrollerdb.txt if
+ * there is one, whose lines win, so a pad can be added or corrected without a rebuild. */
+static char user_mappings[1100];
+void host_set_work(const char *work) { snprintf(user_mappings, sizeof user_mappings, "%s/gamecontrollerdb.txt", work); }
+
 int host_init(int headless, int want_gl) {
     headless_mode = headless;
     if (headless) return 1;
+    char db[1200];
+    const char *base = SDL_GetBasePath();
+    snprintf(db, sizeof db, "%sgamecontrollerdb.txt", base ? base : "");
+    SDL_SetHint(SDL_HINT_GAMECONTROLLERCONFIG_FILE, db);
+#ifdef _WIN32
+    /* SDL's own Switch 2 driver needs libusb, which Windows does not have: let the pad come through as
+       an ordinary controller, which the database maps */
+    SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_SWITCH2, "0");
+#endif
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD | SDL_INIT_AUDIO)) { SDL_Log("SDL_Init: %s", SDL_GetError()); return 0; }
+    FILE *f = fopen(db, "rb");
+    if (f) { fclose(f); rt_log("gamepad: mappings from %s", db); } else rt_log("gamepad: no %s (only SDL's own mappings)", db);
+    if (user_mappings[0] && (f = fopen(user_mappings, "rb"))) {
+        fclose(f);
+        int n = SDL_AddGamepadMappingsFromFile(user_mappings);
+        rt_log("gamepad: %d mapping(s) from %s", n, user_mappings);
+    }
     /* default window: the largest multiple of 480x272 that fits comfortably on the monitor */
     int dh = host_display_height(), mult = dh ? (dh * 3 / 4) / 272 : 2;
     if (mult < 1) mult = 1;
@@ -104,9 +129,28 @@ static void open_pad(SDL_JoystickID id) {
     SDL_Gamepad *g = SDL_OpenGamepad(id);
     if (!g) return;
     int want = SDL_GetGamepadPlayerIndex(g);
-    rt_log("gamepad: %s (id %u), player index %d", SDL_GetGamepadName(g) ? SDL_GetGamepadName(g) : "?", (unsigned)id, want);
+    char guid[64]; SDL_GUIDToString(SDL_GetGamepadGUIDForID(id), guid, sizeof guid);
+    char *map = SDL_GetGamepadMapping(g);
+    const char *type = SDL_GetGamepadStringForType(SDL_GetGamepadType(g));
+    rt_log("gamepad: %s (id %u), player index %d, type %s, guid %s", SDL_GetGamepadName(g) ? SDL_GetGamepadName(g) : "?", (unsigned)id, want,
+           type ? type : "?", guid);
+    rt_log("gamepad: mapping %s", map ? map : "(none)");
+    SDL_free(map);
     for (int i = 0; i < 4; i++) if (!pads_sdl[i]) { pads_sdl[i] = g; pad_rank[i] = (want >= 0 ? want : 8) * 100 + pads_seen++; order_pads(); return; }
     SDL_CloseGamepad(g);
+}
+
+/* The left stick as a d-pad, the way a fighting game wants it: nothing inside a dead zone, then one of
+ * eight directions by angle (45 degrees each). The old per-axis test turned a stick pushed straight
+ * left a little downwards into a diagonal, and so a crouch. */
+#define STICK_DEAD 13000                            /* of 32767: about 40% */
+static uint32_t stick_dir(int x, int y) {
+    if ((long)x * x + (long)y * y < (long)STICK_DEAD * STICK_DEAD) return 0;
+    static const uint32_t dir[8] = { PSP_RIGHT, PSP_RIGHT | PSP_DOWN, PSP_DOWN, PSP_DOWN | PSP_LEFT,
+                                     PSP_LEFT, PSP_LEFT | PSP_UP, PSP_UP, PSP_UP | PSP_RIGHT };
+    double a = SDL_atan2((double)y, (double)x);     /* y grows downwards */
+    int sector = (int)SDL_floor((a + SDL_PI_D / 8) / (SDL_PI_D / 4));
+    return dir[(sector % 8 + 8) % 8];
 }
 
 static uint32_t pad_bits(SDL_Gamepad *g, uint8_t stick[2]) {
@@ -126,8 +170,7 @@ static uint32_t pad_bits(SDL_Gamepad *g, uint8_t stick[2]) {
     if (SDL_GetGamepadButton(g, SDL_GAMEPAD_BUTTON_DPAD_RIGHT)) b |= PSP_RIGHT;
     int lx = SDL_GetGamepadAxis(g, SDL_GAMEPAD_AXIS_LEFTX), ly = SDL_GetGamepadAxis(g, SDL_GAMEPAD_AXIS_LEFTY);
     stick[0] = (uint8_t)((lx + 32768) >> 8); stick[1] = (uint8_t)((ly + 32768) >> 8);
-    if (lx < -16000) b |= PSP_LEFT; else if (lx > 16000) b |= PSP_RIGHT;
-    if (ly < -16000) b |= PSP_UP; else if (ly > 16000) b |= PSP_DOWN;
+    b |= stick_dir(lx, ly);
     if (SDL_GetGamepadAxis(g, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > 16000) b |= PAD_L2;
     if (SDL_GetGamepadAxis(g, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > 16000) b |= PAD_R2;
     return b;

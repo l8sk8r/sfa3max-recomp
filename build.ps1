@@ -140,6 +140,7 @@ $timer = [System.Diagnostics.Stopwatch]::StartNew()
 
 # ---------------------------------------------------------------- git (a clone only)
 $isClone = Test-Path (Join-Path $PSScriptRoot ".git")
+$selfHash = (Get-FileHash -Algorithm SHA256 $PSCommandPath).Hash
 if (-not $isClone) { $Here = $true; $NoPull = $true }
 if (-not $Here) {
     # Don't let a checkout carry uncommitted work onto another branch.
@@ -150,6 +151,17 @@ if (-not $Here) {
     Step "git checkout $Branch" { git checkout $Branch }
 }
 if (-not $NoPull) { Step "git pull" { git pull } }
+if (-not $Here -or -not $NoPull) {
+    # The checkout / pull may have brought a different build.ps1: hand over to it, so the build is
+    # the one that goes with the files it builds.
+    $now = (Get-FileHash -Algorithm SHA256 $PSCommandPath).Hash
+    if ($now -ne $selfHash) {
+        Write-Host "  build.ps1 changed with the checkout: running the new one" -ForegroundColor Yellow
+        $pass = @{} + $PSBoundParameters; $pass["Here"] = $true; $pass["NoPull"] = $true
+        & $PSCommandPath @pass
+        exit $LASTEXITCODE
+    }
+}
 
 # ---------------------------------------------------------------- tools: installed ones, or downloaded
 Write-Host ""
@@ -194,7 +206,7 @@ if ($vs) {
 } else {
     Step "cmake configure (LLVM-MinGW)" {
         cmake -B out -G Ninja "-DCMAKE_BUILD_TYPE=$Config" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ `
-            "-DCMAKE_RC_COMPILER=$llvm\bin\x86_64-w64-mingw32-windres.exe"
+            "-DCMAKE_RC_COMPILER=$(($llvm -replace '\\', '/'))/bin/x86_64-w64-mingw32-windres.exe"   # (CMake reads \ as an escape)
     }
     Step "cmake build ($Config)" { cmake --build out }
 }

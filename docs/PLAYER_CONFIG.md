@@ -5,7 +5,7 @@ player. Choose P1, P2, P3 or P4 CONFIG, move to a row with up / down and change 
 (or Cross, which steps forward). DEFAULT puts that player back to the defaults; EXIT or Circle goes back
 and saves.
 
-All of it is kept in `work/sfa3r.cfg` ([SAVES.md](SAVES.md)), by name, so it can also be edited there.
+All of it is kept in `work/sfa3mr.cfg` ([SAVES.md](SAVES.md)), by name, so it can also be edited there.
 
 ## The buttons
 
@@ -21,7 +21,7 @@ All of it is kept in `work/sfa3r.cfg` ([SAVES.md](SAVES.md)), by name, so it can
 | L2 | PPP | E | Left trigger |
 | R2 | KKK | R | Right trigger |
 
-A PSP has no L2 or R2; SFA3R adds them. Attacks are shown as the game's pictures (L / M / H with a fist
+A PSP has no L2 or R2; SFA3MR adds them. Attacks are shown as the game's pictures (L / M / H with a fist
 or a foot, Taunt, PPP / KKK) and the longer ones by name, as on the original BUTTON CONFIG.
 
 The BUTTON CONFIG in the pause menu has the same rows, L2 and R2 included, for the player who paused

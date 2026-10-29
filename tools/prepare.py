@@ -2,7 +2,7 @@
 """Prepare a build from your own Street Fighter Alpha 3 MAX disc image.
 
 Usage:  python tools/prepare.py [path/to/game.iso] [--no-widescreen]
-        The ISO defaults to SFA3R_ISO if set, else imports/psp/Street Fighter Alpha 3 Max.iso.
+        The ISO defaults to SFA3MR_ISO if set, else imports/psp/Street Fighter Alpha 3 Max.iso.
 
 Writes everything to work/ and build/generated/ (both git-ignored):
   work/iso/...                 the disc's files
@@ -11,7 +11,7 @@ Writes everything to work/ and build/generated/ (both git-ignored):
   work/imports.json            the OS functions it calls
   work/analysis.json           functions, switch tables, code pointers
   build/generated/*.c          the translated program
-Needs Python 3.9+ and `pip install pycdlib`.
+Needs Python 3.9+ only (build.ps1 downloads a copy if needed).
 """
 import sys, os, hashlib, shutil, subprocess
 
@@ -20,22 +20,55 @@ DEFAULT_ISO = os.path.join(ROOT, 'imports', 'psp', 'Street Fighter Alpha 3 Max.i
 KNOWN_BOOT = {'3fd0abf7cc65742233e1b7787997fa3e20152d98': 'ULUS-10062 v1.00 (USA)'}
 
 def extract(iso_path, out):
-    import pycdlib
-    iso = pycdlib.PyCdlib(); iso.open(iso_path)
-    n = 0
-    for root, dirs, files in iso.walk(iso_path='/'):
-        for f in files:
-            src = root.rstrip('/') + '/' + f
-            dst = os.path.join(out, *src.replace(';1', '').strip('/').split('/'))
-            os.makedirs(os.path.dirname(dst), exist_ok=True)
-            iso.get_file_from_iso(dst, iso_path=src); n += 1
-    iso.close()
-    return n
+    """Copy every file of the disc image (plain ISO 9660, as a UMD image is) to OUT."""
+    S = 2048
+    with open(iso_path, 'rb') as f:
+        def sector(n, count=1):
+            f.seek(n * S); return f.read(S * count)
+        pvd = sector(16)
+        if pvd[1:6] != b'CD001': raise SystemExit('prepare.py: %s is not an ISO 9660 disc image' % iso_path)
+        def records(lba, size):
+            data = sector(lba, (size + S - 1) // S); pos = 0
+            while pos < size:
+                n = data[pos]
+                if n == 0: pos = (pos // S + 1) * S; continue   # records do not cross sectors
+                r = data[pos:pos + n]; pos += n
+                name = r[33:33 + r[32]]
+                if name in (b'\0', b'\1'): continue
+                yield name.decode('ascii').split(';')[0], int.from_bytes(r[2:6], 'little'), int.from_bytes(r[10:14], 'little'), r[25] & 2
+        count = 0
+        def walk(lba, size, dst):
+            nonlocal count
+            for name, at, length, is_dir in records(lba, size):
+                path = os.path.join(dst, name)
+                if is_dir: walk(at, length, path); continue
+                os.makedirs(dst, exist_ok=True)
+                with open(path, 'wb') as o:
+                    f.seek(at * S); left = length
+                    while left:
+                        chunk = f.read(min(left, 1 << 20)); o.write(chunk); left -= len(chunk)
+                count += 1
+        root = pvd[156:190]
+        walk(int.from_bytes(root[2:6], 'little'), int.from_bytes(root[10:14], 'little'), out)
+    return count
 
-WS_REPO = 'https://github.com/Rickow/SFA3max-PSP-widescreen.git'
+WS_REPO = 'https://github.com/Rickow/SFA3max-PSP-widescreen'
+WS_ZIP = WS_REPO + '/archive/HEAD.zip'
+
+def fetch_widescreen(dst):
+    """Download the patch's repository as a zip (no git needed) into DST."""
+    import io, urllib.request, zipfile
+    data = urllib.request.urlopen(WS_ZIP, timeout=60).read()
+    with zipfile.ZipFile(io.BytesIO(data)) as z:
+        for m in z.infolist():
+            rel = m.filename.split('/', 1)[1] if '/' in m.filename else ''
+            if not rel or m.is_dir(): continue
+            path = os.path.join(dst, *rel.split('/'))
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, 'wb') as o: o.write(z.read(m))
 
 def widescreen_overlay(boot, work):
-    """The SFA3MAX 16:9 patch (Rickow, MIT) as an overlay on the unpatched program, so SFA3R can
+    """The SFA3MAX 16:9 patch (Rickow, MIT) as an overlay on the unpatched program, so SFA3MR can
     switch it on and off while running (SCREEN SETTING > SCREEN SIZE > WIDE FORCED). The patch is
     downloaded here and applied to a copy; work/boot.widescreen.json records, by load address, the
     words it changes in .text ("text": translated both ways, chosen at run time) and the code it adds
@@ -49,7 +82,10 @@ def widescreen_overlay(boot, work):
     patcher = os.path.join(work, 'SFA3max-PSP-widescreen', 'sfa3_ws_patternpatcher.py')
     try:
         if not os.path.exists(patcher):
-            subprocess.check_call(['git', 'clone', '--depth', '1', WS_REPO, os.path.dirname(patcher)])
+            try: fetch_widescreen(os.path.dirname(patcher))
+            except Exception as ex:                          # (a network that only lets git through)
+                print('  zip download failed (%s): trying git' % ex)
+                subprocess.check_call(['git', 'clone', '--depth', '1', WS_REPO + '.git', os.path.dirname(patcher)])
         tmp = os.path.join(work, 'boot.widescreen.elf')
         run(patcher, boot, tmp)
     except Exception as ex:
@@ -75,10 +111,10 @@ def run(*args):
 
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
-    iso = args[0] if args else os.environ.get('SFA3R_ISO') or DEFAULT_ISO
+    iso = args[0] if args else os.environ.get('SFA3MR_ISO') or DEFAULT_ISO
     if not os.path.isfile(iso):
         sys.exit('prepare.py: %s not found. Put your Street Fighter Alpha 3 MAX ISO (US, ULUS-10062) there, '
-                 'or give its path (or set SFA3R_ISO).' % iso)
+                 'or give its path (or set SFA3MR_ISO).' % iso)
     work = os.path.join(ROOT, 'work'); gen = os.path.join(ROOT, 'build', 'generated')
     os.makedirs(work, exist_ok=True)
     print('extracting', iso); print('  %d files' % extract(iso, os.path.join(work, 'iso')))

@@ -1,4 +1,4 @@
-# SFA3R: Street Fighter Alpha 3: Recomp
+# SFA3MR: Street Fighter Alpha 3 MAX Recomp
 
 A native Windows static recompile of **Street Fighter Alpha 3 MAX** (PSP). The aim is the most complete
 version of the game: every character and mode of the PSP release, plus local multiplayer for up to three
@@ -49,7 +49,7 @@ It isn't perfect either: it's one device = one player, which isn't a great pick 
 Why I picked it:
 
 - The modes and roster are comprehensive, and I think I can lean into extending it well.
-- Widescreen (sort of). It messes up the pixel ratio, but there are patches around that help. SFA3R
+- Widescreen (sort of). It messes up the pixel ratio, but there are patches around that help. SFA3MR
   uses the [SFA3MAX PSP widescreen patch by Rickow](https://github.com/Rickow/SFA3max-PSP-widescreen).
 
 Why I wish I hadn't:
@@ -121,76 +121,59 @@ Open problems: [docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md).
 
 ## Prerequisites
 
-- Windows 10 / 11, x64
-- Visual Studio 2026 with C/C++ (includes CMake)
-- Python 3.9+ with `pip install pycdlib`
-- Git (also needed when building from a release zip: it fetches SDL3 and the widescreen patch)
-- Your own **Street Fighter Alpha 3 MAX** PSP disc image (ISO), US release `ULUS-10062`, placed at
-  `imports\psp\Street Fighter Alpha 3 Max.iso` (git-ignored)
+- Windows 10 (1803 or later) or 11, x64
+- Your own **Street Fighter Alpha 3 MAX** PSP disc image (ISO), US release `ULUS-10062`
+- An internet connection for the first build
 
-CMake downloads and builds SDL3 the first time (a few minutes). `prepare.py` also downloads the SFA3MAX
-16:9 patch (Rickow, MIT) for WIDE FORCED; `--no-widescreen` leaves it out.
+Nothing else needs installing: the first build downloads the tools it needs (about 300 MB) into a
+`.tools` folder inside the game's folder. (If you already have Visual Studio or Python, it uses them.)
 
 ## Building
 
 ### Windows
 
-1. Install the [prerequisites](#prerequisites) above.
-2. Download the **Source code (zip)** of the [latest release](https://github.com/l8sk8r/sfa3max-recomp/releases/latest).
-3. Open the zip and copy the folder from inside it. Rename it without the version number, so it
+1. Download the **Source code (zip)** of the [latest release](https://github.com/l8sk8r/sfa3max-recomp/releases/latest).
+2. Open the zip and copy the folder from inside it. Rename it without the version number, so it
    becomes `sfa3max-recomp`, and move it where you want to run it. In this example it is
    `C:\sfa3max-recomp`.
-4. Copy your ISO into it as `C:\sfa3max-recomp\imports\psp\Street Fighter Alpha 3 Max.iso` (make the
+3. Copy your ISO into it as `C:\sfa3max-recomp\imports\psp\Street Fighter Alpha 3 Max.iso` (make the
    `imports\psp` folders if they are not there).
-5. Search for and launch **Windows PowerShell**.
-6. Change to the folder:
+4. Search for and launch **Windows PowerShell**.
+5. Change to the folder:
    ```
    cd C:\sfa3max-recomp
    ```
-7. Build, and start the game when it is done:
+6. Build, and start the game when it is done:
    ```
    .\build.ps1 -Run
    ```
-   The first build takes a while: it extracts the disc, translates the game and downloads SDL3. If
-   PowerShell says running scripts is disabled, run `Set-ExecutionPolicy -Scope Process Bypass` in the
-   same window first. Other options are [below](#buildps1-options).
+   The first build takes a while: it downloads the build tools, extracts the disc and translates the
+   game. If PowerShell says running scripts is disabled, run `Set-ExecutionPolicy -Scope Process Bypass`
+   in the same window first. Other options are [below](#options).
 
 **Playing after that:** in PowerShell,
 ```
 cd C:\sfa3max-recomp
-.\out\Release\sfa3r.exe --work work
+.\out\Release\sfa3mr.exe --work work
 ```
-or make a shortcut to `C:\sfa3max-recomp\out\Release\sfa3r.exe` with `--work C:\sfa3max-recomp\work`
+or make a shortcut to `C:\sfa3max-recomp\out\Release\sfa3mr.exe` with `--work C:\sfa3max-recomp\work`
 after it in the shortcut's Target.
 
 **Updating:** download the new release's Source code (zip) and copy what is in its folder over your
 `sfa3max-recomp` folder (your ISO, `work\` and saves stay), then run `.\build.ps1 -Run` again.
 
-### build.ps1 options
+### Options
+
+Add these after `.\build.ps1` if you need them:
 
 | Option | |
 |---|---|
-| `-Run` | start the game after a successful build |
-| `-Iso path` | the ISO, if it is not at `imports\psp\Street Fighter Alpha 3 Max.iso` (or set `SFA3R_ISO`) |
-| `-ForceWideScreen:$false` | build without the 16:9 patch (no WIDE FORCED) |
-| `-SkipPrepare` | reuse the extracted disc and translated code from the last build |
-| `-Config Debug` | a debug build (`out\Debug\sfa3r.exe`) |
-| `-Here`, `-NoPull` | in a git clone: build the current branch / do not pull first (by default it checks out and pulls `main`) |
+| `-Run` | start the game when the build is done |
+| `-Iso "D:\path\to\your.iso"` | your ISO is somewhere else, or named differently |
+| `-ForceWideScreen:$false` | leave out the widescreen patch (no WIDE FORCED) |
 
-### From a git clone (developers)
-
-The same script works in a clone; by default it checks out and pulls `main` first. In VS Code it is the
-default build task (**Ctrl+Shift+B**). By hand:
-
-```
-python tools/prepare.py
-cmake -B out -G "Visual Studio 18 2026" -A x64
-cmake --build out --config Release
-out\Release\sfa3r.exe --work work
-```
-
-`prepare.py` writes `work/` (the disc's files and the analysis) and `build/generated/` (the translated
-C). Both are git-ignored and must never be committed. Re-run it after pulling changes to `tools/`.
+For developers (working from a git clone, VS Code, every option, building by hand):
+[docs/BUILDING.md](docs/BUILDING.md).
 
 ## Playing
 
@@ -199,7 +182,7 @@ C). Both are git-ignored and must never be committed. Re-run it after pulling ch
 | Arrow keys | D-pad | D-pad or left stick |
 | Z / X / A / S | Cross / Circle / Square / Triangle | South / East / West / North |
 | Q / W | L / R | Shoulders |
-| E / R | L2 / R2 (SFA3R's own) | Triggers |
+| E / R | L2 / R2 (SFA3MR's own) | Triggers |
 | Enter / Backspace | Start / Select | Start / Back |
 | F2 | Back to the MODE MENU at once, without saving (keyboard only) | |
 | F11 or Alt+Enter | Full screen | |
@@ -217,7 +200,7 @@ in, with the player it is: 1P red and 2P blue on the left, 3P green and 4P yello
   DRAMATIC BATTLE as on a PSP. You are the host; players 2 and 3 are gamepads 2 and 3, or the computer
   (CPU2 / CPU3) when not plugged in.
 - **Buttons:** OPTION MODE > PLAYER CONFIG, for players 1 to 4 ([docs/PLAYER_CONFIG.md](docs/PLAYER_CONFIG.md)).
-- **Saves and settings:** `work/sfa3r.cfg` (every setting, by name) and `work/sfa3r.dat` (the rest);
+- **Saves and settings:** `work/sfa3mr.cfg` (every setting, by name) and `work/sfa3mr.dat` (the rest);
   AUTO SAVE is always on, and loads and saves happen without screens. PSP / PPSSPP saves can be
   imported and exported ([docs/SAVES.md](docs/SAVES.md)).
 - **Hidden extras** (all unlocked): hold **L + R** while confirming Dramatic Battle, Variable Battle,
@@ -226,7 +209,7 @@ in, with the player it is: 1P red and 2P blue on the left, 3P green and 4P yello
 - **EX. SETTING:** 1P / 2P / 3P JOIN-IN, COUCH CO-OP (network modes on this PC), DEFAULT; the version is
   shown in its corner.
 
-A log is written to `work/sfa3r.log`.
+A log is written to `work/sfa3mr.log`.
 
 ### Command line
 
@@ -248,9 +231,9 @@ A log is written to `work/sfa3r.log`.
 | Path | What |
 |---|---|
 | `tools/` | `prepare.py` (the whole pipeline), `psp_elf.py`, `psp_imports.py`, `psp_analyze.py`, `psp_recomp.py`; `data/hooks.txt` lists the game functions replaced by native code |
-| `src/runtime/` | the native runtime: memory, threads, files, graphics, sound, input, and SFA3R's changes to the game |
+| `src/runtime/` | the native runtime: memory, threads, files, graphics, sound, input, and SFA3MR's changes to the game |
 | `third_party/` | ATRAC3/ATRAC3+ decoder from PPSSPP / FFmpeg (LGPL 2.1+), libkirk |
-| `docs/` | [architecture](docs/ARCHITECTURE.md), [decisions](docs/DECISIONS.md), [program map](docs/PSP_PROGRAM_MAP.md), [players](docs/PLAYERS.md), [controllers](docs/CONTROLLERS.md), [buttons](docs/PLAYER_CONFIG.md), [saves](docs/SAVES.md), [other versions](docs/VERSION_DIFFERENCES.md), [known issues](docs/KNOWN_ISSUES.md) |
+| `docs/` | [building](docs/BUILDING.md), [architecture](docs/ARCHITECTURE.md), [decisions](docs/DECISIONS.md), [program map](docs/PSP_PROGRAM_MAP.md), [players](docs/PLAYERS.md), [controllers](docs/CONTROLLERS.md), [buttons](docs/PLAYER_CONFIG.md), [saves](docs/SAVES.md), [other versions](docs/VERSION_DIFFERENCES.md), [known issues](docs/KNOWN_ISSUES.md) |
 
 ## Contributing
 

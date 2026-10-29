@@ -3,7 +3,7 @@
  * netplay_buttons() (gamepads 2 and 3, or the CPU stand-in when a pad is missing).
  *
  * The game's network battles are lockstep: every PSP runs the whole game and only buttons travel.
- * What a real second PSP sends was recorded between two linked instances (SFA3R_NETCAP=1) and is
+ * What a real second PSP sends was recorded between two linked instances (SFA3MR_NETCAP=1) and is
  * reproduced here, answering the player's instance message by message:
  *
  *   lobby      beacons and matching HELLO / REQUEST, as a guest that wants to play

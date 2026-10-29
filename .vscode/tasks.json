@@ -2,36 +2,112 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "SFA3R: Build (main)",
+            "label": "SFA3MR: Build (main)",
             "type": "shell",
             "command": "powershell",
-            "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/build.ps1"],
-            "group": { "kind": "build", "isDefault": true },
-            "problemMatcher": ["$msCompile"]
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/build.ps1"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ]
         },
         {
-            "label": "SFA3R: Build current branch",
+            "label": "SFA3MR: Build current branch",
             "type": "shell",
             "command": "powershell",
-            "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/build.ps1", "-Here"],
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/build.ps1",
+                "-Here"
+            ],
             "group": "build",
-            "problemMatcher": ["$msCompile"]
+            "problemMatcher": [
+                "$msCompile"
+            ]
         },
         {
-            "label": "SFA3R: Build (main, no WIDE FORCED)",
+            "label": "SFA3MR: Build (main, no WIDE FORCED)",
             "type": "shell",
             "command": "powershell",
-            "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/build.ps1", "-ForceWideScreen:$false"],
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/build.ps1",
+                "-ForceWideScreen:$false"
+            ],
             "group": "build",
-            "problemMatcher": ["$msCompile"]
+            "problemMatcher": [
+                "$msCompile"
+            ]
         },
         {
-            "label": "SFA3R: Build and run (main)",
+            "label": "SFA3MR: Build and run (main)",
             "type": "shell",
             "command": "powershell",
-            "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}/build.ps1", "-Run"],
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/build.ps1",
+                "-Run"
+            ],
             "group": "build",
-            "problemMatcher": ["$msCompile"]
+            "problemMatcher": [
+                "$msCompile"
+            ]
+        },
+        {
+            "label": "SFA3MR: Build current branch as it is (no pull)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/build.ps1",
+                "-Here",
+                "-NoPull"
+            ],
+            "group": "build",
+            "problemMatcher": [
+                "$msCompile"
+            ]
+        },
+        {
+            "label": "SFA3MR: Recompile and run (current branch, no prepare)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/build.ps1",
+                "-Here",
+                "-NoPull",
+                "-SkipPrepare",
+                "-Run"
+            ],
+            "group": "build",
+            "problemMatcher": [
+                "$msCompile"
+            ]
         }
     ]
 }

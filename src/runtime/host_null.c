@@ -1,6 +1,6 @@
 /* Headless host: no window, no sound. Used for tests and when built without SDL. */
 #include "host.h"
-#ifndef SFA3R_SDL
+#ifndef SFA3MR_SDL
 int  host_init(int headless, int want_gl) { (void)headless; (void)want_gl; return 1; }
 HostGetProc host_gl_getproc(void) { return 0; }
 void host_gl_swap(void) {}

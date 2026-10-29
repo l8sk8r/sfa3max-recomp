@@ -1,6 +1,6 @@
 /* Boot: load the relocated program, start module_start on a root thread, run the scheduler.
  *
- * sfa3r [--work DIR] [--frames N] [--fast] [--trace]
+ * sfa3mr [--work DIR] [--frames N] [--fast] [--trace]
  *   --work DIR   folder written by tools/prepare.py (default: work)
  *   --frames N   quit after N frames (for tests)
  *   --fast       do not wait for the wall clock
@@ -10,7 +10,7 @@
  *   --scale N    GPU internal resolution, N x 480x272 (1-8; default: covers the monitor)
  *   --p2 / --p3 human|cpu|auto   who controls fighters 2 and 3 (auto: human if gamepad 2/3 is connected)
  *   --pads LIST                  the gamepads (1-4) shown as plugged in on the MODE MENU's pad icons (tests)
- *   --watch LO-HI  log loads/stores to that range by game address (build with -DSFA3R_WATCH=ON)
+ *   --watch LO-HI  log loads/stores to that range by game address (build with -DSFA3MR_WATCH=ON)
  *   --watch-from N start watching at frame N
  *   --watch-pc PC  only report accesses made by the instruction at PC (repeatable, up to 16)
  *   --dump-from N   no screens saved before frame N
@@ -19,7 +19,7 @@
  *   --net-hub PORT   be node 0 of a local multi-instance network (PORT 0: any)
  *   --net-join PORT N  be node N (1-3) of that network (tests)
  *   --renderer none|lazy  draw nothing / only the frames being dumped (tests)
- *   --log FILE   write the log there instead of work/sfa3r.log
+ *   --log FILE   write the log there instead of work/sfa3mr.log
  *   --record-audio DIR   write each PSP audio channel to DIR/chN.wav
  *   --input S    scripted buttons, "FRAME=BUTTONS;..." e.g. "200=cross;206=" (names: cross circle square
  *                triangle start select up down left right l r, joined with +; "p2:" before them for pad 2)
@@ -79,7 +79,7 @@ void rt_syscall(Cpu *c, uint32_t code, uint32_t pc) { (void)c; rt_fatal("syscall
 void rt_break(Cpu *c, uint32_t pc) { (void)c; rt_fatal("break at %08X", pc); }
 void rt_unsupported(Cpu *c, uint32_t pc) { (void)c; rt_fatal("unsupported instruction at %08X", pc); }
 
-/* ---------------------------------------------------------------- memory watch (SFA3R_WATCH builds) */
+/* ---------------------------------------------------------------- memory watch (SFA3MR_WATCH builds) */
 uint32_t rt_watch_lo = 1, rt_watch_hi = 0;      /* empty range */
 static long watch_from;
 static uint32_t watch_pc[16]; static int nwatch_pc;
@@ -278,7 +278,7 @@ void rt_report(void) {
 
 static long file_size(const char *p) { struct stat s; return stat(p, &s) == 0 ? (long)s.st_size : -1; }
 
-#ifdef SFA3R_SDL
+#ifdef SFA3MR_SDL
 #define SDL_MAIN_HANDLED
 #include <SDL3/SDL_main.h>
 #endif
@@ -313,7 +313,7 @@ int main(int argc, char **argv) {
             extern int rt_pads_forced; rt_pads_forced = 0;
             for (const char *p = argv[++i]; *p; p++) if (*p >= '1' && *p <= '4') rt_pads_forced |= 1 << (*p - '1');
         }
-        else if (!strcmp(argv[i], "--watch") && i + 1 < argc) {      /* LO-HI (hex), SFA3R_WATCH builds only */
+        else if (!strcmp(argv[i], "--watch") && i + 1 < argc) {      /* LO-HI (hex), SFA3MR_WATCH builds only */
             const char *w = argv[++i]; rt_watch_lo = (uint32_t)strtoul(w, NULL, 16) & 0x0FFFFFFF;
             const char *d = strchr(w, '-'); rt_watch_hi = d ? (uint32_t)strtoul(d + 1, NULL, 16) & 0x0FFFFFFF : rt_watch_lo + 4;
         }
@@ -332,7 +332,7 @@ int main(int argc, char **argv) {
     }
     char path[1200];
     if (log_path) snprintf(path, sizeof path, "%s", log_path);
-    else snprintf(path, sizeof path, "%s/sfa3r.log", work);
+    else snprintf(path, sizeof path, "%s/sfa3mr.log", work);
     log_file = fopen(path, "w");
     snprintf(rt_disc_root, sizeof rt_disc_root, "%s/iso", work);
     snprintf(rt_save_root, sizeof rt_save_root, "%s/ms0", work);

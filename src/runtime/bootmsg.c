@@ -5,7 +5,7 @@
  * row of 16x16 tiles unpacked (0x088D2B64) into 64x64 4-bit textures and drawn tile by tile. Both
  * are kept off screen (their textures are cleared); the load itself takes no time (sysdata.c). The
  * textures are recognised by their contents (FNV-1a of the 2 KB) at the addresses the boot screen
- * uses, and only in the first frames after boot. (SFA3R's version is shown on EX. SETTING.)
+ * uses, and only in the first frames after boot. (SFA3MR's version is shown on EX. SETTING.)
  */
 #include "rt.h"
 #include <string.h>

@@ -1,8 +1,8 @@
 /* Headless OpenGL for tests (Linux, Mesa): a surfaceless EGL context, so the GPU renderer can run
- * and be checked without a window. Built only with -DSFA3R_EGL=ON. */
+ * and be checked without a window. Built only with -DSFA3MR_EGL=ON. */
 #include <stddef.h>
 typedef void *(*GetProc)(const char *);
-#ifdef SFA3R_EGL
+#ifdef SFA3MR_EGL
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 #include <stdio.h>

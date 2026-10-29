@@ -1,4 +1,4 @@
-/* SFA3R shim: aligned allocation for the decoder. */
+/* SFA3MR shim: aligned allocation for the decoder. */
 #pragma once
 #include <cstdlib>
 #include <cstddef>

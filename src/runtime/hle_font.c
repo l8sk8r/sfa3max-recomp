@@ -20,8 +20,8 @@ static void put_style(uint32_t a) {
     memset(HOST(a), 0, 168);
     wf(a + 0, 16.0f); wf(a + 4, 16.0f); wf(a + 8, 128.0f); wf(a + 12, 128.0f); wf(a + 16, 1.0f);
     WH(a + 20, 1); WH(a + 22, 1); WH(a + 24, 0); WH(a + 26, 1); WH(a + 28, 1); WH(a + 30, 1);
-    strcpy((char *)HOST(a + 32), "SFA3R Pixel");
-    strcpy((char *)HOST(a + 96), "sfa3r.pgf");
+    strcpy((char *)HOST(a + 32), "SFA3MR Pixel");
+    strcpy((char *)HOST(a + 96), "sfa3mr.pgf");
 }
 static int glyph_of(uint32_t ch) { return ch >= 32 && ch <= 126 ? (int)ch - 32 : '?' - 32; }
 

@@ -37,5 +37,5 @@ body:
     id: log
     attributes:
       label: Log
-      description: Paste the end of work/sfa3r.log, or attach the file
+      description: Paste the end of work/sfa3mr.log, or attach the file
       render: text

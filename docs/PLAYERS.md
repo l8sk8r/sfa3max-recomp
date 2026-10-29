@@ -1,6 +1,6 @@
 # Who plays which fighter
 
-How SFA3R decides whether a fighter is played by a pad or by the computer, mode by mode, and what is
+How SFA3MR decides whether a fighter is played by a pad or by the computer, mode by mode, and what is
 unchanged from the PSP game. Code: `src/runtime/hooks.c` (`apply_local_players`), with
 `src/runtime/playercfg.c` for the buttons. Decision 19.
 
@@ -57,7 +57,7 @@ Examples:
 - P2 starts Arcade, 1P HUMAN: the opponent is pad 1.
 - P1 starts Dramatic Battle, 2P CPU, 3P HUMAN: the partner is the computer, the boss is pad 3.
 
-## What else SFA3R changes in these modes (whatever JOIN-IN says)
+## What else SFA3MR changes in these modes (whatever JOIN-IN says)
 
 - Pads 2 and 3 feed the game's player 2 and 3 controller slots (the PSP had one pad), so a second
   pad can press Start to join wherever the game lets player 2 join.

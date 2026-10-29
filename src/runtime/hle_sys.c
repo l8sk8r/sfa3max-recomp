@@ -221,7 +221,7 @@ void hle_sceUtilitySavedataInitStart(Cpu *c) {
     switch (mode) {
     case 0: case 2: case 4: {                               /* AUTOLOAD, LOAD, LISTLOAD */
         long n;
-        if (store_is_ours(file)) n = store_load(file, RW(prm + 0x74), RW(prm + 0x78));   /* sfa3r.dat / .cfg */
+        if (store_is_ours(file)) n = store_load(file, RW(prm + 0x74), RW(prm + 0x78));   /* sfa3mr.dat / .cfg */
         else {
             sd_dir(prm, sd_pick_name(prm, 1, name), dir, sizeof dir);
             snprintf(path, sizeof path, "%s/%s", dir, file);

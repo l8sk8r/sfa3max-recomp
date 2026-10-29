@@ -1,4 +1,4 @@
-/* SFA3R shim: the CPU-architecture checks the decoder uses. */
+/* SFA3MR shim: the CPU-architecture checks the decoder uses. */
 #pragma once
 #define PPSSPP_ARCH(x) PPSSPP_ARCH_##x
 #if defined(_M_X64) || defined(__x86_64__)

@@ -5,7 +5,7 @@
                                         └─translate──► build/generated/*.c  (one C function per game function)
                                                               │
                      ┌────────────────────────────────────────┴───────────────┐
-                     │                 sfa3r.exe (Windows x64)                 │
+                     │                 sfa3mr.exe (Windows x64)                 │
                      │  translated game code (+ hooks: native replacements)    │
                      │      │ calls 181 OS functions                           │
                      │  HLE layer: threads · files · save data · display ·     │
@@ -39,7 +39,7 @@ pointer, and `psp_recomp.py` turns each function into `void f_XXXXXXXX(Cpu *c)`.
   small scheduler runs the highest-priority ready thread. Frames kept off screen (loads and saves) are
   not paced, so they take no time.
 - **Time**: vblank at 59.94 Hz drives the frame pacing.
-- **Files**: `disc0:` / `umd0:` read from the extracted disc. Saves go to `sfa3r.dat` / `sfa3r.cfg`
+- **Files**: `disc0:` / `umd0:` read from the extracted disc. Saves go to `sfa3mr.dat` / `sfa3mr.cfg`
   (SAVES.md).
 - **Sound**: `hle_atrac.c` decodes music with the vendored ATRAC3+ decoder; `hle_sas.c` is the PSP's
   voice synthesiser (VAG, ADSR, pitch, and the reverb in `sas_reverb.c`) in C, following PPSSPP. The game
@@ -67,9 +67,9 @@ Possible next steps: texture upscaling, integer-scaled presentation of the 480×
   `net_link.c` carries its traffic to **virtual players** in the process (or to other instances over
   TCP, for tests). `vpeer.c` plays those players: lobby, streams, settings block, sync words and one
   word of buttons per frame. `netplay.c` starts them, picks HOST in Dramatic Battle, names the players
-  and plays the computer for a missing pad. `SFA3R_NETCAP=1` logs every packet.
+  and plays the computer for a missing pad. `SFA3MR_NETCAP=1` logs every packet.
 
-## 5. SFA3R's own changes
+## 5. SFA3MR's own changes
 
 - Menus: EX. SETTING, PLAYER CONFIG with P1 - P4 CONFIG, SAVE LOAD's extra rows, OPTION MODE tiles in
   one font (exsetting.c, tiles.c); L2 / R2 buttons (playercfg.c).
@@ -83,7 +83,8 @@ Possible next steps: texture upscaling, integer-scaled presentation of the 480×
 
 ## 6. Build and test
 
-- CMake, Visual Studio 2026 generator, x64. The generated C is about 19 MB in 38 files.
+- CMake. `build.ps1` builds with Visual Studio 2026 / 2022 when it is installed, otherwise with LLVM-MinGW
+  (clang) and Ninja, which it downloads (docs/BUILDING.md); gcc / clang on Linux build it too. The generated C is about 19 MB in 38 files.
 - Scripted headless runs (`--headless --fast --input ... --dump ...`) of every mode, compared screen by
   screen, check that changes leave the rest of the game alone.
 - PPSSPP is the reference for the PSP's behaviour.

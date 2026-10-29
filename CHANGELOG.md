@@ -4,6 +4,17 @@ Each version's section here becomes its release notes. To release: in the pull r
 `VERSION` and add its section below; merging into `main` tags it and publishes the release
 (`.github/workflows/release.yml`).
 
+## 1.1.0
+
+- Nothing to install to build: `build.ps1` uses the build tools you have (Visual Studio, CMake,
+  Python) and downloads the ones you don't (LLVM-MinGW, CMake, Ninja, Python). Git and pip are no
+  longer needed.
+- A simpler build guide for players in the README, and a [developers' guide](docs/BUILDING.md)
+  (git clone, VS Code tasks, every option).
+- The project is now called **SFA3MR** (Street Fighter Alpha 3 MAX Recomp): the game is
+  `sfa3mr.exe`, and its saves `sfa3mr.dat` / `sfa3mr.cfg`. Settings and saves from earlier
+  versions are not carried over.
+
 ## 1.0.3
 
 - Fixes to the build documentation and steps.

@@ -1,11 +1,11 @@
-/* sfa3r.cfg: every setting, by name, in sections. Written by the program (OPTION MODE screens, the
+/* sfa3mr.cfg: every setting, by name, in sections. Written by the program (OPTION MODE screens, the
  * game's saves, closing); it can also be edited by hand while the program is closed.
  *
- *   [ex setting]     SFA3R's own options (OPTION MODE > EX. SETTING; JOIN-IN: docs/PLAYERS.md)
+ *   [ex setting]     SFA3MR's own options (OPTION MODE > EX. SETTING; JOIN-IN: docs/PLAYERS.md)
  *   [game option]    OPTION MODE > GAME OPTION
  *   [screen setting] OPTION MODE > SCREEN SETTING
  *   [p1 config] .. [p4 config]   OPTION MODE > PLAYER CONFIG: each button's attack (names as on the
- *                    screen, or 0-54), COMMAND, TYPE and RAPID. L2 / R2 and player 4 are SFA3R's own
+ *                    screen, or 0-54), COMMAND, TYPE and RAPID. L2 / R2 and player 4 are SFA3MR's own
  *   [progress]       unlock bits (all held on by sysdata.c)
  *
  * The game keeps the settings in its options block (0x08A058A0, the system data's first piece:
@@ -177,7 +177,7 @@ void settings_load(void) {
     make_names();
     memset(&pend, 0xFF, sizeof pend);
     store_load_files();
-    char path[1100]; store_path(path, sizeof path, "sfa3r.cfg");
+    char path[1100]; store_path(path, sizeof path, "sfa3mr.cfg");
     FILE *f = fopen(path, "r");
     if (f) {
         char line[256], section[64] = "ex setting";
@@ -194,7 +194,7 @@ void settings_load(void) {
             char *eq = strchr(line, '='); if (!eq) continue;
             *eq = 0; char *key = line, *val = eq + 1; trim(key); trim(val);
             for (char *s = key; *s; s++) *s = (char)tolower((unsigned char)*s);
-            /* SFA3R's options (and the flat names of the first versions) */
+            /* SFA3MR's options (and the flat names of the first versions) */
             if (key[0] == 'p' && key[1] >= '1' && key[1] <= '3' && (!strcmp(key + 2, "_join_in") || !strcmp(key + 2, "_override"))) {   /* (_override: before 0.5.x) */
                 int v = lookup(val, v_human, 2);              /* HUMAN / CPU (or the first versions' ON / OFF) */
                 rt_join_in[key[1] - '1'] = v >= 0 ? v : is_on(val);
@@ -253,8 +253,8 @@ static void write_fields(FILE *f, const uint8_t *o, const char *only, int not) {
 }
 static void cfg_body(FILE *f) {
     const uint8_t *o = store_options();
-    fprintf(f, "# SFA3R settings. Written by the program; it can be edited while the program is closed.\n"
-               "# The game's own data (records, World Tour, ...) is in sfa3r.dat; these settings win over it.\n"
+    fprintf(f, "# SFA3MR settings. Written by the program; it can be edited while the program is closed.\n"
+               "# The game's own data (records, World Tour, ...) is in sfa3mr.dat; these settings win over it.\n"
                "# Button settings: see docs/PLAYER_CONFIG.md.\n");
     fprintf(f, "\n[ex setting]\n");
     for (int k = 0; k < 3; k++) { char l[48]; snprintf(l, sizeof l, "p%d_join_in=%s", k + 1, v_human[!!rt_join_in[k]]); fprintf(f, "%-24s # HUMAN: pad %d plays a fighter nobody started with; CPU: the computer does\n", l, k + 1); }
@@ -284,7 +284,7 @@ static int write_cfg(const char *path) {
     remove(path);
     return rename(tmp, path) == 0;
 }
-void settings_write(void) { char p[1100]; store_path(p, sizeof p, "sfa3r.cfg"); write_cfg(p); }
+void settings_write(void) { char p[1100]; store_path(p, sizeof p, "sfa3mr.cfg"); write_cfg(p); }
 
 /* our screens changed something: the game's current settings and ours */
 void settings_save(void) { store_sync_live(); settings_write(); }

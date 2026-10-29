@@ -26,5 +26,5 @@ says what changed).
 | # | Status | Issue | Notes |
 |---|---|---|---|
 | E5 | possible | **EXPORT not tried in PPSSPP or on a real PSP.** Exports use PPSSPP's save encryption and PARAM.SFO hashing (checked against PPSSPP's code, both ways) with the game's key. One PARAM.SFO hash needs a PSP's own key; PPSSPP writes a stand-in there too. | psp_savecrypt.c; SAVES.md |
-| E6 | possible | **IMPORT not tried with a save from a PSP or PPSSPP** (only with SFA3R's own exports). | savestore.c `import_one` |
+| E6 | possible | **IMPORT not tried with a save from a PSP or PPSSPP** (only with SFA3MR's own exports). | savestore.c `import_one` |
 | E7 | known | **Pad 4 cannot pause, or edit P4 CONFIG from the pause menu.** The game has three player slots, and pad 4 plays no fighter yet; P4 CONFIG is set in OPTION MODE > PLAYER CONFIG. To come with a 2v2 / X.Dramatic mode. | hooks.c `f_08828AF4`, exsetting.c (pause BUTTON CONFIG) |

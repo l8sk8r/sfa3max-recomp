@@ -92,7 +92,7 @@ Volume setting byte: 0x08AD8040 (written by 0x089E688C; read by the sound thread
 Both files carry 0x3399 at +0x280 and have no checksum. Loading (0x08816FC4) copies them in pieces:
 SYS +0x284 (0x208 bytes) → 0x08A058A0, +0x48C (0x17C0) → 0x08A05AA8, +0x1C4C (0x3C0) → 0x08A07268,
 +0x200C (0x140) → 0x08A07628, +0x214C (0x13F8) → 0x09519588, +0x3544 (4) → 0x08A05894;
-WTR +0x284 (0x174C) → 0x09517E38. SFA3R keeps these files in sfa3r.dat / sfa3r.cfg (savestore.c,
+WTR +0x284 (0x174C) → 0x09517E38. SFA3MR keeps these files in sfa3mr.dat / sfa3mr.cfg (savestore.c,
 settings.c), not on a memory stick; a PSP keeps them encrypted (see "save key" below, docs/SAVES.md).
 
 | Address | Meaning |
@@ -107,7 +107,7 @@ settings.c), not on a memory stick; a PSP keeps them encrypted (see "save key" b
 | 0x08E75BA0 slot bits | game bits: 0x10 Square, 0x20 Triangle, 0x40 L, 0x80 Cross, 0x100 Circle, 0x200 R, 0x4000 SELECT, 0x8000 START; 1/2/4/8 directions |
 | 0x08A058A0 + 0x200 | ISM-Pluses earned (one bit each in bits 0-27, 26 in all; bit 0 Alpha Combo, bit 4 ∞ Guard, bit 5 Auto Guard; the mode rewards at 0x0883B884 give bits 15-27 by mode). EDIT MODE lists the rest as ???. All held on (sysdata.c) |
 | 0x08A058A0 + 0x204 | GAME OPTION > MODE SELECT (1 on; file +0x488). On in the save made on first start |
-| 0x08A058A0 + 0x3C.. | GAME OPTION: +0x3C difficulty 0-7, +0x3D time (30 60 99 ∞), +0x3E rounds (1 3 5), +0x40 damage 0-3 (and +0x42), +0x43 speed TURBO1-7 (0: +0x44 NORMAL / FREE1 / FREE2), +0x45 S.C. gauge (0 MAX), +0x1FC / +0x1FD BGM / S.E. volume 0-15, +0x1FF player side. Value names at 0x08A379C0 on. Kept in sfa3r.cfg (settings.c) |
+| 0x08A058A0 + 0x3C.. | GAME OPTION: +0x3C difficulty 0-7, +0x3D time (30 60 99 ∞), +0x3E rounds (1 3 5), +0x40 damage 0-3 (and +0x42), +0x43 speed TURBO1-7 (0: +0x44 NORMAL / FREE1 / FREE2), +0x45 S.C. gauge (0 MAX), +0x1FC / +0x1FD BGM / S.E. volume 0-15, +0x1FF player side. Value names at 0x08A379C0 on. Kept in sfa3mr.cfg (settings.c) |
 | 0x08A058A0 + 0x58 | SCREEN SETTING > SCREEN SIZE (NORMAL / WIDE, and +0x62); +0x1FE WALLPAPER (NONE, 01-10) |
 | 0x08AEF75C | OPTION MODE's copy of the options block (0x208 bytes) |
 | 0x08E75910 + 0x2D | the difficulty in effect (GAME OPTION edits it and writes 0x08A058A0 + 0x3C, 0x088B6318); the other settings in effect are near it, filled from the options block after a load (LOAD row: 0x088B73B8 → 0x088B6108) |
@@ -193,7 +193,7 @@ fighter 1 = partner, fighter 2 = the boss.** P2's Start opens the game's own "2P
 
 The yes/no prompt at boot ("Do you wish to begin the game without auto-loading?") is a different dialog.
 
-## Network battle protocol (recorded with SFA3R_NETCAP=1)
+## Network battle protocol (recorded with SFA3MR_NETCAP=1)
 
 Lobby groups: VERSUS, LEAGUEVS, TOURNAVS, TEAM, LEAGUETM, TOURNATM, DRAMATIC, VARIABLE.
 Group "VERSUS" (P2P matching, mode 3) or "DRAMATIC" (parent mode 1 with children mode 2), matching

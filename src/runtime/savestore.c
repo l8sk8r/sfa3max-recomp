@@ -1,4 +1,4 @@
-/* The game's saves, kept in SFA3R's own two files instead of the PSP memory stick.
+/* The game's saves, kept in SFA3MR's own two files instead of the PSP memory stick.
  *
  * The game builds its saves as PSP files in memory and hands them to the OS (sceUtilitySavedata*):
  *   STFALPH3.SYS (system data, 0x3600 bytes, save ULUS100620000)
@@ -14,13 +14,13 @@
  *   WTR  +0x284  0x174C  0x09517E38  World Tour
  *
  * Here (hle_sys.c) every load and save of those two files goes to this module instead:
- *   <work>/sfa3r.dat  the pieces, as named blocks of hex (all of them, so nothing is lost)
- *   <work>/sfa3r.cfg  the settings in the options piece, by name (settings.c); they win over the
- *                     same bytes in sfa3r.dat, so the file can be edited by hand
+ *   <work>/sfa3mr.dat  the pieces, as named blocks of hex (all of them, so nothing is lost)
+ *   <work>/sfa3mr.cfg  the settings in the options piece, by name (settings.c); they win over the
+ *                     same bytes in sfa3mr.dat, so the file can be edited by hand
  * A save made by the game writes both files. The settings are also written when they change on our
  * own screens and when the program closes (taken from the game's memory, saved or not).
  *
- * On the first run with no sfa3r.dat, a save on the memory stick (<work>/ms0/PSP/SAVEDATA, as the
+ * On the first run with no sfa3mr.dat, a save on the memory stick (<work>/ms0/PSP/SAVEDATA, as the
  * earlier versions wrote it) is imported. With nothing there either, the game's defaults are taken
  * (sysdata.c) the first time the game asks for its system data.
  */
@@ -67,7 +67,7 @@ static void header(uint8_t *img, uint32_t size) { memset(img, 0, size); img[MAGI
 int store_is_ours(const char *file) { return !strcmp(file, "STFALPH3.SYS") || !strcmp(file, "STFALPH3.WTR"); }
 static int is_sys(const char *file) { return !strcmp(file, "STFALPH3.SYS"); }
 
-/* ---------------------------------------------------------------- sfa3r.dat */
+/* ---------------------------------------------------------------- sfa3mr.dat */
 static void write_block(FILE *f, const char *what, const Piece *p, const uint8_t *img) {
     fprintf(f, "\n[%s %s %08X %X]\n", what, p->name, p->mem, p->len);
     for (uint32_t i = 0; i < p->len; i++) fprintf(f, "%02X%s", img[p->off + i], (i % 32 == 31 || i + 1 == p->len) ? "\n" : "");
@@ -84,17 +84,17 @@ static int write_atomic(const char *path, void (*body)(FILE *)) {
     return 1;
 }
 static void dat_body(FILE *f) {
-    fprintf(f, "# SFA3R game data: the pieces of the PSP save files, in hex. The settings among them\n"
-               "# (game options, screen, button configs, unlocks) are also in sfa3r.cfg, which wins.\n"
+    fprintf(f, "# SFA3MR game data: the pieces of the PSP save files, in hex. The settings among them\n"
+               "# (game options, screen, button configs, unlocks) are also in sfa3mr.cfg, which wins.\n"
                "# [file block address length]\n");
     if (store_have_sys) for (size_t i = 0; i < sizeof sys_pieces / sizeof *sys_pieces; i++) write_block(f, "system", &sys_pieces[i], store_sys);
     if (store_have_wtr) write_block(f, "worldtour", &wtr_pieces[0], store_wtr);
 }
-static int dat_write(void) { char p[1200]; store_path(p, sizeof p, "sfa3r.dat"); return write_atomic(p, dat_body); }
+static int dat_write(void) { char p[1200]; store_path(p, sizeof p, "sfa3mr.dat"); return write_atomic(p, dat_body); }
 
 static int hexval(int ch) { return isdigit(ch) ? ch - '0' : (ch >= 'A' && ch <= 'F') ? ch - 'A' + 10 : (ch >= 'a' && ch <= 'f') ? ch - 'a' + 10 : -1; }
 static int dat_read(void) {
-    char p[1200]; store_path(p, sizeof p, "sfa3r.dat");
+    char p[1200]; store_path(p, sizeof p, "sfa3mr.dat");
     FILE *f = fopen(p, "r");
     if (!f) return 0;
     char line[512];
@@ -109,7 +109,7 @@ static int dat_read(void) {
             size_t n = list == sys_pieces ? sizeof sys_pieces / sizeof *sys_pieces : 1;
             if (!list) continue;
             for (size_t i = 0; i < n; i++) if (!strcmp(list[i].name, name)) cur = &list[i];
-            if (!cur) { rt_log("store: unknown block %s %s in sfa3r.dat", what, name); continue; }
+            if (!cur) { rt_log("store: unknown block %s %s in sfa3mr.dat", what, name); continue; }
             if (list == sys_pieces) { if (!got_sys++) header(store_sys, SYS_SIZE); img = store_sys; }
             else { if (!got_wtr++) header(store_wtr, WTR_SIZE); img = store_wtr; }
             at = 0;
@@ -125,14 +125,14 @@ static int dat_read(void) {
     }
     fclose(f);
     store_have_sys = got_sys > 0; store_have_wtr = got_wtr > 0;
-    rt_log("store: read sfa3r.dat (system data %s, World Tour %s)", store_have_sys ? "yes" : "no", store_have_wtr ? "yes" : "no");
+    rt_log("store: read sfa3mr.dat (system data %s, World Tour %s)", store_have_sys ? "yes" : "no", store_have_wtr ? "yes" : "no");
     return 1;
 }
 
 /* ---------------------------------------------------------------- PSP save folders: IMPORT / EXPORT */
 /* A PSP (or PPSSPP) keeps each save in SAVEDATA/<game><save>/: the data file, encrypted with the
  * game's key (crypt mode 3, psp_savecrypt.c), PARAM.SFO (titles, the file's hash, its own hashes) and
- * ICON0.PNG. The memory stick folder of the earlier SFA3R versions has the data files unencrypted
+ * ICON0.PNG. The memory stick folder of the earlier SFA3MR versions has the data files unencrypted
  * and no PARAM.SFO; both kinds are read. */
 static const uint8_t game_key[16] = { 0x00, 0x6F, 0xAF, 0x01, 0xD5, 0x70, 0x00, 0x02, 0xC7, 0x12, 0x24, 0x2E, 0xBA, 0x83, 0xFF, 0xE1 };
 #define CRYPT_MODE 3                                 /* SDK 2.5, secure version 0, with a key */
@@ -336,7 +336,7 @@ int store_exists(const char *name) {
     return -1;                                       /* not one of ours */
 }
 
-/* SAVE LOAD > DELETE: the system data back to the game's defaults (World Tour kept), and SFA3R's own
+/* SAVE LOAD > DELETE: the system data back to the game's defaults (World Tour kept), and SFA3MR's own
    settings too; the game then LOADs it (exsetting.c) */
 extern int rt_join_in[3], rt_couch_coop, rt_l2[4], rt_r2[4];
 extern uint8_t rt_p4_config[20];

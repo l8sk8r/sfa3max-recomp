@@ -1,6 +1,6 @@
 # Controllers
 
-SFA3R reads the keyboard and up to four gamepads through SDL3. Any controller SDL3 knows as a
+SFA3MR reads the keyboard and up to four gamepads through SDL3. Any controller SDL3 knows as a
 gamepad should work: Xbox / XInput pads, DualSense and DualShock 4, Switch Pro, and the many others in
 SDL's controller database. So far it has been tested with four DualSense pads on Windows 11; reports
 for other controllers are welcome.
@@ -33,7 +33,7 @@ yellow on the right.
 | Square | A | West | X | Square |
 | Triangle | S | North | Y | Triangle |
 | L / R | Q / W | Shoulders | LB / RB | L1 / R1 |
-| L2 / R2 (SFA3R's own) | E / R | Triggers | LT / RT | L2 / R2 |
+| L2 / R2 (SFA3MR's own) | E / R | Triggers | LT / RT | L2 / R2 |
 | Start | Enter | Start | Menu | Options |
 | Select | Backspace | Back | View | Create |
 

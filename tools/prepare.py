@@ -2,7 +2,7 @@
 """Prepare a build from your own Street Fighter Alpha 3 MAX disc image.
 
 Usage:  python tools/prepare.py [path/to/game.iso] [--no-widescreen]
-        The ISO defaults to SFA3R_ISO if set, else imports/psp/Street Fighter Alpha 3 Max.iso.
+        The ISO defaults to SFA3MR_ISO if set, else imports/psp/Street Fighter Alpha 3 Max.iso.
 
 Writes everything to work/ and build/generated/ (both git-ignored):
   work/iso/...                 the disc's files
@@ -68,7 +68,7 @@ def fetch_widescreen(dst):
             with open(path, 'wb') as o: o.write(z.read(m))
 
 def widescreen_overlay(boot, work):
-    """The SFA3MAX 16:9 patch (Rickow, MIT) as an overlay on the unpatched program, so SFA3R can
+    """The SFA3MAX 16:9 patch (Rickow, MIT) as an overlay on the unpatched program, so SFA3MR can
     switch it on and off while running (SCREEN SETTING > SCREEN SIZE > WIDE FORCED). The patch is
     downloaded here and applied to a copy; work/boot.widescreen.json records, by load address, the
     words it changes in .text ("text": translated both ways, chosen at run time) and the code it adds
@@ -111,10 +111,10 @@ def run(*args):
 
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
-    iso = args[0] if args else os.environ.get('SFA3R_ISO') or DEFAULT_ISO
+    iso = args[0] if args else os.environ.get('SFA3MR_ISO') or DEFAULT_ISO
     if not os.path.isfile(iso):
         sys.exit('prepare.py: %s not found. Put your Street Fighter Alpha 3 MAX ISO (US, ULUS-10062) there, '
-                 'or give its path (or set SFA3R_ISO).' % iso)
+                 'or give its path (or set SFA3MR_ISO).' % iso)
     work = os.path.join(ROOT, 'work'); gen = os.path.join(ROOT, 'build', 'generated')
     os.makedirs(work, exist_ok=True)
     print('extracting', iso); print('  %d files' % extract(iso, os.path.join(work, 'iso')))

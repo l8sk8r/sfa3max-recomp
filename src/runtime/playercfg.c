@@ -5,7 +5,7 @@
  * Select and Start (NO USE), then COMMAND (+0x10), TYPE (+0x11) and RAPID (+0x12). An attack is 0-0x36:
  *   0-5 L/M/H punch, L/M/H kick   6 PPP   7 KKK   8 PP   9 KK   10 LP+LK   11 MP+MK   12 HP+HK
  *   13 no use   14 taunt   15-38 SPECIAL1-8 L/M/H   39-53 S.COMBO1-5 LV1-3   54 VARIABLE 1
- * Player 4 is not in the game; its config and every player's L2 and R2 are kept in sfa3r.cfg
+ * Player 4 is not in the game; its config and every player's L2 and R2 are kept in sfa3mr.cfg
  * (settings.c).
  *
  * How a fighter's buttons are read, once a frame, by 0x08864DFC (a0 = fighter): the held game bits of

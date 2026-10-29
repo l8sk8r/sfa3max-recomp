@@ -6,7 +6,7 @@
   "status": "playable",
   "wikidata": "Q2633628",
   "original": { "region": "USA", "serial": "ULUS-10062" },
-  "project": "SFA3R: Street Fighter Alpha 3: Recomp",
+  "project": "SFA3MR: Street Fighter Alpha 3 MAX Recomp",
   "approach": "Static recompilation of the PSP program to C with its own translator; PSP OS in HLE; SDL3 and OpenGL",
   "targets": ["Windows"],
   "toolchain": "Custom",

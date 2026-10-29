@@ -289,9 +289,9 @@ int rt_net_session;                         /* the game's network is up (AdhocIn
 void hle_sceNetAdhocInit(Cpu *c) { rt_net_session = 1; STUB_UNLESS_COOP(sceNetAdhocInit); NLOG("AdhocInit"); RET(0); }
 void hle_sceNetAdhocTerm(Cpu *c) { rt_net_session = 0; STUB_UNLESS_COOP(sceNetAdhocTerm); NLOG("AdhocTerm"); if (rt_net_on_group) rt_net_on_group(NULL); RET(0); }
 
-/* protocol capture (SFA3R_NETCAP=1): every packet the game sends or takes, with the caller */
+/* protocol capture (SFA3MR_NETCAP=1): every packet the game sends or takes, with the caller */
 static void netcap(const char *what, int sock, uint32_t ra, const uint8_t *p, uint32_t n) {
-    static int on = -1; if (on < 0) on = getenv("SFA3R_NETCAP") != NULL;
+    static int on = -1; if (on < 0) on = getenv("SFA3MR_NETCAP") != NULL;
     if (!on) return;
     char hx[3 * 256 + 1]; uint32_t k = n < 256 ? n : 256;
     for (uint32_t i = 0; i < k; i++) snprintf(hx + 3 * i, 4, "%02X ", p[i]);

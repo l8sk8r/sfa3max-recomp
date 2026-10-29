@@ -29,8 +29,8 @@ static inline void WH(uint32_t a, uint32_t v) { uint16_t h = (uint16_t)v; memcpy
 static inline void WB(uint32_t a, uint32_t v) { *HOST(a) = (uint8_t)v; }
 
 /* Loads and stores from translated code carry the game address of the instruction. Normally they
-   compile to plain accesses; build with SFA3R_WATCH to log accesses to a watched range (--watch). */
-#ifdef SFA3R_WATCH
+   compile to plain accesses; build with SFA3MR_WATCH to log accesses to a watched range (--watch). */
+#ifdef SFA3MR_WATCH
 extern uint32_t rt_watch_lo, rt_watch_hi;
 void rt_watch_hit(uint32_t addr, uint32_t pc, uint32_t value, int size, int write);
 static inline uint32_t MRW(uint32_t a, uint32_t pc) { uint32_t v = RW(a); if ((a & 0x0FFFFFFF) - rt_watch_lo < rt_watch_hi - rt_watch_lo) rt_watch_hit(a, pc, v, 4, 0); return v; }

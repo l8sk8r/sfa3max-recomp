@@ -5,7 +5,7 @@
 int  host_init(int headless, int want_gl);                     /* 0 on failure */
 typedef void *(*HostGetProc)(const char *);
 HostGetProc host_gl_getproc(void);                             /* OpenGL 3.3 core context's loader, or NULL */
-HostGetProc host_headless_gl(void);                            /* headless test context (SFA3R_EGL builds), or NULL */
+HostGetProc host_headless_gl(void);                            /* headless test context (SFA3MR_EGL builds), or NULL */
 void host_gl_swap(void);
 void host_window_size(int *w, int *h);                         /* drawable size in pixels */
 int  host_display_height(void);                                /* the monitor's height in pixels (0 if unknown) */

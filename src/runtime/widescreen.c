@@ -9,7 +9,7 @@
  * The patch draws for the game's NORMAL screen size (4:3, un-stretched), so OPTION MODE > SCREEN
  * SETTING > SCREEN SIZE gets a third value, WIDE FORCED: the game's own value (0x08A058A0 + 0x58, and
  * + 0x62) is NORMAL and rt_widescreen is set. Choosing NORMAL or WIDE, or anything setting the game's
- * value to WIDE (DEFAULT, a LOAD, an IMPORT), turns it off. Kept in sfa3r.cfg as screen_size=WIDE FORCED;
+ * value to WIDE (DEFAULT, a LOAD, an IMPORT), turns it off. Kept in sfa3mr.cfg as screen_size=WIDE FORCED;
  * the PSP save (EXPORT) says WIDE.
  *
  * SCREEN SETTING: 0x088B700C changes SCREEN SIZE (0x088B7D08: a0 pad, a1 value, a2 last value; for

@@ -62,7 +62,7 @@ A release is made by merging a version: in the pull request, raise `VERSION` (fo
 ## Reporting a bug
 
 Use the bug report form. Include the version (bottom corner of OPTION MODE > EX. SETTING), the mode,
-your controllers, the steps to make it happen, and `work/sfa3r.log` if you can.
+your controllers, the steps to make it happen, and `work/sfa3mr.log` if you can.
 
 ## Licence
 

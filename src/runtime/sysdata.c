@@ -2,7 +2,7 @@
  * everything is unlocked.
  *
  * Saves: STFALPH3.SYS (system data, 0x3600 bytes) and STFALPH3.WTR (World Tour, 0x1A00 bytes), kept in
- * sfa3r.dat / sfa3r.cfg (savestore.c, settings.c), not on the memory stick. Both carry 0x3399 at +0x280; there is no
+ * sfa3mr.dat / sfa3mr.cfg (savestore.c, settings.c), not on the memory stick. Both carry 0x3399 at +0x280; there is no
  * checksum. Loading (0x08816FC4) copies the file in pieces into the game's working copy:
  *
  *   SYS  +0x284  0x208   -> 0x08A058A0   options and unlocks (below)

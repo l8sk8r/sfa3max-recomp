@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    One-shot build of sfa3r.exe: extract and translate your disc, then compile.
+    One-shot build of sfa3mr.exe: extract and translate your disc, then compile.
 
 .DESCRIPTION
     Uses the build tools you have installed, and downloads the ones you don't into .tools\ (once;
@@ -11,7 +11,7 @@
         Python    3.9+ on PATH, or downloaded
     Then it runs:
         python tools/prepare.py      (extract the ISO, translate the game to C)
-        cmake configure + build      (out\Release\sfa3r.exe)
+        cmake configure + build      (out\Release\sfa3mr.exe)
     and stops at the first step that fails. In a git clone it first checks out and pulls main,
     unless -Here / -NoPull. More: docs/BUILDING.md.
 
@@ -22,7 +22,7 @@
     .\build.ps1 -Here                     # git clone: build the branch you are on (no checkout, still pulls)
 #>
 param(
-    [string]$Iso = "",          # your ISO, if not imports\psp\Street Fighter Alpha 3 Max.iso (or SFA3R_ISO)
+    [string]$Iso = "",          # your ISO, if not imports\psp\Street Fighter Alpha 3 Max.iso (or SFA3MR_ISO)
     [string]$Branch = "main",   # git clone: branch to check out before building
     [switch]$Here,              # git clone: stay on the current branch instead of checking out $Branch
     [switch]$NoPull,            # git clone: skip git pull
@@ -214,8 +214,8 @@ if ($vs) {
 $timer.Stop()
 $what = if ($isClone) { "'" + (git branch --show-current) + "'" } else { "this folder" }
 Write-Host ""
-Write-Host ("Build succeeded on {0} in {1:mm\:ss}: out\{2}\sfa3r.exe" -f $what, $timer.Elapsed, $Config) -ForegroundColor Green
+Write-Host ("Build succeeded on {0} in {1:mm\:ss}: out\{2}\sfa3mr.exe" -f $what, $timer.Elapsed, $Config) -ForegroundColor Green
 
 if ($Run) {
-    Step "run sfa3r" { & ".\out\$Config\sfa3r.exe" --work work }
+    Step "run sfa3mr" { & ".\out\$Config\sfa3mr.exe" --work work }
 }

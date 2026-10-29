@@ -27,8 +27,8 @@ jobs:
           V: ${{ steps.v.outputs.version }}
         run: |
           {
-            echo "> **No game is included.** You build SFA3R from your own copy of the game (the US PSP disc, \`ULUS-10062\`): download the **Source code (zip)** below and follow [Building](https://github.com/${GITHUB_REPOSITORY}#building)."
+            echo "> **No game is included.** You build SFA3MR from your own copy of the game (the US PSP disc, \`ULUS-10062\`): download the **Source code (zip)** below and follow [Building](https://github.com/${GITHUB_REPOSITORY}#building)."
             echo
             awk -v v="$V" '/^## /{p=($2==v); next} p' CHANGELOG.md
           } > notes.md
-          gh release create "v$V" --target "$GITHUB_SHA" --title "SFA3R v$V" --notes-file notes.md
+          gh release create "v$V" --target "$GITHUB_SHA" --title "SFA3MR v$V" --notes-file notes.md

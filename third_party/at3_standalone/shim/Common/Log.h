@@ -1,4 +1,4 @@
-/* SFA3R shim: decoder log messages go to stderr (errors and warnings only). */
+/* SFA3MR shim: decoder log messages go to stderr (errors and warnings only). */
 #pragma once
 #include <cstdio>
 namespace Log { enum { ME }; }

@@ -7,7 +7,7 @@
  *   south = cross, east = circle, west = square, north = triangle, shoulders = L/R,
  *   d-pad or left stick = directions, start/back = start/select.
  */
-#ifdef SFA3R_SDL
+#ifdef SFA3MR_SDL
 #include "host.h"
 #include <SDL3/SDL.h>
 void rt_log(const char *fmt, ...);
@@ -37,7 +37,7 @@ int host_init(int headless, int want_gl) {
     /* default window: the largest multiple of 480x272 that fits comfortably on the monitor */
     int dh = host_display_height(), mult = dh ? (dh * 3 / 4) / 272 : 2;
     if (mult < 1) mult = 1;
-    const char *title = "Street Fighter Alpha 3 MAX (SFA3R)";
+    const char *title = "Street Fighter Alpha 3 MAX (SFA3MR)";
     if (want_gl) {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);

@@ -1,7 +1,52 @@
-# Building
+# Building (developers)
 
-The quick way is in the [README](../README.md#building): put your ISO in place and run
-`.\build.ps1 -Run`. This page covers what the script does, its options, and building by hand.
+Players: the [README](../README.md#building) is all you need. This page is for working on SFA3MR from a
+git clone: the recommended tools, VS Code, everything `build.ps1` does and every option, and building
+by hand.
+
+## Recommended tools
+
+`build.ps1` uses these when they are installed and downloads what is missing into `.tools\`:
+
+- **Visual Studio 2026** (or 2022) with *Desktop development with C++* (it includes CMake). Without it
+  the script builds with LLVM-MinGW (clang), downloaded.
+- **Python 3.9 or later** (from python.org, with "Add to PATH"). Without it Python is downloaded.
+- **Git**, for the clone.
+- **VS Code** (optional), for its build tasks.
+
+## Working from a clone
+
+```
+git clone https://github.com/l8sk8r/sfa3max-recomp.git C:\_Repos\sfa3max-recomp
+cd C:\_Repos\sfa3max-recomp
+```
+
+Put your ISO at `imports\psp\Street Fighter Alpha 3 Max.iso` (git-ignored), then:
+
+- **`.\build.ps1 -Run`** checks out `main`, pulls it, builds and plays. If the pull brings a new
+  `build.ps1`, the script hands over to that one.
+- **`.\build.ps1 -Here -Run`** builds the branch you are on (after pulling it); add **`-NoPull`** to
+  build it exactly as it is on your disk.
+- **`.\build.ps1 -Here -NoPull -SkipPrepare -Run`** only recompiles: the quickest after a change in
+  `src\runtime\`.
+
+Branches, commits and pull requests: [CONTRIBUTING.md](../CONTRIBUTING.md).
+
+### VS Code
+
+Open the folder in VS Code; **Terminal > Run Build Task** (**Ctrl+Shift+B**) runs the default task,
+and **Terminal > Run Task** lists them all (`.vscode/tasks.json`):
+
+| Task | Runs |
+|---|---|
+| SFA3MR: Build (main) (default) | `.\build.ps1`: checks out and pulls `main`, builds |
+| SFA3MR: Build current branch | `.\build.ps1 -Here` |
+| SFA3MR: Build (main, no WIDE FORCED) | `.\build.ps1 -ForceWideScreen:$false` |
+| SFA3MR: Build and run (main) | `.\build.ps1 -Run` |
+| SFA3MR: Build current branch as it is (no pull) | `.\build.ps1 -Here -NoPull` |
+| SFA3MR: Recompile and run (current branch, no prepare) | `.\build.ps1 -Here -NoPull -SkipPrepare -Run` |
+
+Build errors from Visual Studio show up in the Problems panel.
 
 ## What `build.ps1` does
 
@@ -23,7 +68,7 @@ The quick way is in the [README](../README.md#building): put your ISO in place a
    applies the widescreen patch as an overlay (unless `-ForceWideScreen:$false`), analyses the game
    program and translates it to C in `build\generated\` (about 19 MB).
 4. **CMake configure and build** in `out\`: downloads SDL3 (once) and compiles everything into
-   `out\Release\sfa3r.exe` (or `out\Debug\...` with `-Config Debug`). If `out\` was made by the other
+   `out\Release\sfa3mr.exe` (or `out\Debug\...` with `-Config Debug`). If `out\` was made by the other
    toolchain, it is started again.
 5. **`-Run`:** starts the game with `--work work`.
 
@@ -34,7 +79,7 @@ It stops at the first step that fails, and says which.
 | Option | What it does |
 |---|---|
 | `-Run` | Start the game after a successful build. |
-| `-Iso path` | Your ISO, if it is not at `imports\psp\Street Fighter Alpha 3 Max.iso`. The `SFA3R_ISO` environment variable does the same. |
+| `-Iso path` | Your ISO, if it is not at `imports\psp\Street Fighter Alpha 3 Max.iso`. The `SFA3MR_ISO` environment variable does the same. |
 | `-ForceWideScreen:$false` | Leave out the SFA3MAX 16:9 patch: no WIDE FORCED in SCREEN SETTING, and nothing downloaded for it. |
 | `-Toolchain Auto` | The default: Visual Studio if it is installed, otherwise LLVM-MinGW. |
 | `-Toolchain VisualStudio` | Visual Studio only; stops if it is not installed. |
@@ -63,9 +108,9 @@ In VS Code the default build task (**Ctrl+Shift+B**) runs `build.ps1`.
 |---|---|---|
 | `imports\psp\` | your ISO | yours |
 | `.tools\` | downloaded build tools | yes: downloaded again when needed |
-| `work\` | the disc's files, the analysis, **and your saves and settings** (`sfa3r.dat`, `sfa3r.cfg`) | keep the two save files |
+| `work\` | the disc's files, the analysis, **and your saves and settings** (`sfa3mr.dat`, `sfa3mr.cfg`) | keep the two save files |
 | `build\generated\` | the translated C | yes: made again by `prepare.py` |
-| `out\` | the CMake build and `sfa3r.exe` | yes: built again |
+| `out\` | the CMake build and `sfa3mr.exe` | yes: built again |
 
 All of these are git-ignored and must never be committed.
 
@@ -78,7 +123,7 @@ All of these are git-ignored and must never be committed.
 - **Strange build errors after switching toolchain or updating:** delete `out\` and build again.
 - **The ISO is not found:** check the name and place (`imports\psp\Street Fighter Alpha 3 Max.iso`) or
   use `-Iso`.
-- The log of the game itself is `work\sfa3r.log`.
+- The log of the game itself is `work\sfa3mr.log`.
 
 ## By hand
 
@@ -88,7 +133,7 @@ With Visual Studio 2026 and Python 3.9+:
 python tools/prepare.py
 cmake -B out -G "Visual Studio 18 2026" -A x64
 cmake --build out --config Release
-out\Release\sfa3r.exe --work work
+out\Release\sfa3mr.exe --work work
 ```
 
 With LLVM-MinGW, CMake and Ninja on `PATH`:
@@ -97,15 +142,15 @@ With LLVM-MinGW, CMake and Ninja on `PATH`:
 python tools/prepare.py
 cmake -B out -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 cmake --build out
-out\Release\sfa3r.exe --work work
+out\Release\sfa3mr.exe --work work
 ```
 
 `prepare.py` takes the ISO's path as its argument, and `--no-widescreen`. Re-run it after pulling
 changes to `tools\`.
 
-## Linux (developers)
+## Linux
 
 The same code builds with gcc or clang (this is how the automated tests run): `python3 tools/prepare.py`,
 then `cmake -B out && cmake --build out -j`. SDL3 needs its usual Linux development packages
 ([SDL's list](https://wiki.libsdl.org/SDL3/README-linux#build-dependencies)). The game is
-`out/sfa3r --work work`. Linux is not a supported target yet.
+`out/sfa3mr --work work`. Linux is not a supported target yet.

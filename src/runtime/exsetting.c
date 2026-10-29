@@ -10,7 +10,7 @@
  * a picture made at run time (SCREEN SETTING's background mirrored, lettered by tiles.c) on a texture
  * page of our own, and the other buttons get pictures made the same way; all six are laid out in the height the five had, slightly shorter each. Choosing a
  * button below EX. SETTING passes the game its own item number. EX. SETTING opens a screen of ours
- * with SFA3R's own options (settings.c); Circle or EXIT goes back and saves them.
+ * with SFA3MR's own options (settings.c); Circle or EXIT goes back and saves them.
  */
 #include "rt.h"
 #include "version.h"
@@ -49,7 +49,7 @@ static uint32_t mem;                        /* our block: two page textures (256
 enum { S_TITLE, S_P1, S_P2, S_P3, S_COOP, S_EXIT, S_ON, S_OFF, S_HUMAN, S_CPU, S_PLAYER, S_P1C, S_P2C, S_P3C, S_P4C, S_TAUNT,
        S_COMMAND, S_TYPE, S_RAPID, S_DEFAULT, S_EXIT2, S_VERSION, S_COUNT };
 static const char *const strings[S_COUNT] = { "EX. SETTING", "1P JOIN-IN", "2P JOIN-IN", "3P JOIN-IN", "COUCH CO-OP", "EXIT", "ON", "OFF", "HUMAN", "CPU",
-    "PLAYER CONFIG", "P1 CONFIG", "P2 CONFIG", "P3 CONFIG", "P4 CONFIG", "TAUNT", "COMMAND", "TYPE", "RAPID", "DEFAULT", "EXIT", SFA3R_VERSION };
+    "PLAYER CONFIG", "P1 CONFIG", "P2 CONFIG", "P3 CONFIG", "P4 CONFIG", "TAUNT", "COMMAND", "TYPE", "RAPID", "DEFAULT", "EXIT", SFA3MR_VERSION };
 static int clone = -1, item_v, sub_from, built;
 static int starting;                        /* the option menu just started, not laid out yet (f_088B5FB8) */
 static long seen = -1;
@@ -235,7 +235,7 @@ static void symbol(Cpu *c, int sel, int id, int x, int y) {
     memcpy(&c->r[4], keep, sizeof keep); c->r[31] = ra;
 }
 
-/* EX. SETTING: SFA3R's options */
+/* EX. SETTING: SFA3MR's options */
 enum { R_P1, R_P2, R_P3, R_COOP, R_DEFAULT, R_EXIT, N_ROWS };
 static int *const row_value[N_ROWS] = { &rt_join_in[0], &rt_join_in[1], &rt_join_in[2], &rt_couch_coop, NULL, NULL };
 static const int row_label[N_ROWS] = { S_P1, S_P2, S_P3, S_COOP, S_DEFAULT, S_EXIT };
@@ -243,14 +243,14 @@ static const int row_names[N_ROWS][2] = { { S_CPU, S_HUMAN }, { S_CPU, S_HUMAN }
 static void ex_open(Cpu *c) { mode = M_EX; row = 0; bar_y = -1; WB(OPT + 5, EX_ITEM + 1); WB(OPT + 7, 0); bar_on(c); sound(c, 0x39); }
 static void ex_close(Cpu *c, int snd) { mode = M_MENU; WB(OPT + 5, 0); WB(OPT + 7, 0); bar_off(); settings_save(); sound(c, snd); }
 #define VERSION_Y 0xD4
-#define VERSION_X (0x178 - 8 * (int)(sizeof SFA3R_VERSION - 1))
+#define VERSION_X (0x178 - 8 * (int)(sizeof SFA3MR_VERSION - 1))
 static void ex_screen(Cpu *c) {
     uint32_t p = pressed();
     if (p & 8) { row = (row + N_ROWS - 1) % N_ROWS; sound(c, 0x38); }
     else if (p & 4) { row = (row + 1) % N_ROWS; sound(c, 0x38); }
     else if ((p & 3) && row_value[row]) { *row_value[row] = !*row_value[row]; sound(c, 0x38); }
     else if ((p & B_CONFIRM) && row_value[row]) { *row_value[row] = !*row_value[row]; sound(c, 0x39); }
-    else if ((p & B_CONFIRM) && row == R_DEFAULT) {          /* DEFAULT: as a fresh sfa3r.cfg (settings.c) */
+    else if ((p & B_CONFIRM) && row == R_DEFAULT) {          /* DEFAULT: as a fresh sfa3mr.cfg (settings.c) */
         rt_join_in[0] = rt_join_in[1] = rt_join_in[2] = 0; rt_couch_coop = 1; sound(c, 0x39);
     }
     else if ((p & B_CONFIRM) && row == R_EXIT) { ex_close(c, 0x39); return; }   /* EXIT chosen: a confirm */
@@ -262,7 +262,7 @@ static void ex_screen(Cpu *c) {
         text(c, STR(row_label[i]), 1, 0x30, y, colour);
         if (row_value[i]) text(c, STR(row_names[i][!!*row_value[i]]), 1, 0xA0, y, 0xB);   /* values: always yellow, as GAME OPTION */
     }
-    text(c, STR(S_VERSION), 0, VERSION_X, VERSION_Y, 0xA);   /* SFA3R's version, bottom right in the small font: just shown */
+    text(c, STR(S_VERSION), 0, VERSION_X, VERSION_Y, 0xA);   /* SFA3MR's version, bottom right in the small font: just shown */
 }
 
 /* PLAYER CONFIG: P1 - P4 CONFIG and EXIT on the menu's buttons */
@@ -495,7 +495,7 @@ void f_088BA8F4(Cpu *c) {
 /* The game's SAVE LOAD submenu (logic 0x088B70F8, drawing 0x088B7AE8; row in the option context's +7:
  * SAVE, LOAD, DELETE, AUTO SAVE, EXIT) gets two more rows before EXIT:
  *   IMPORT  reads the PSP saves (system data and World Tour) in <work>/import (savestore.c), keeps
- *           them in sfa3r.dat / sfa3r.cfg (the previous ones are copied to .bak first) and gives
+ *           them in sfa3mr.dat / sfa3mr.cfg (the previous ones are copied to .bak first) and gives
  *           them to the game at once
  *   EXPORT  writes the saves to <work>/export as a PSP keeps them (encrypted, with PARAM.SFO), to
  *           copy to a PSP's or PPSSPP's PSP/SAVEDATA
@@ -568,7 +568,7 @@ void f_088B70F8(Cpu *c) {
         return;
     }
     if (r == SL_DELETE && (p & B_CONFIRM)) {                  /* DELETE: the system data back to the defaults (World Tour kept) */
-        backup("sfa3r.dat"); backup("sfa3r.cfg");
+        backup("sfa3mr.dat"); backup("sfa3mr.cfg");
         if (store_delete_sys()) { sl_game_load(c); WB(OPT + 7, SL_DELETE); sl_say("SYSTEM DATA DELETED", NULL); }
         else { sl_say("DELETE FAILED", NULL); sound(c, 0x2F); }
         return;
@@ -580,7 +580,7 @@ void f_088B70F8(Cpu *c) {
     if (r == SL_EXIT) { sl_leave(c, 0x39); return; }
     if (r == SL_IMPORT) {
         store_path(dir, sizeof dir, "import");
-        backup("sfa3r.dat"); backup("sfa3r.cfg");
+        backup("sfa3mr.dat"); backup("sfa3mr.cfg");
         int n = store_import(dir);
         if (n) {
             /* the game takes it in by its own LOAD (0x088B73B8, as if chosen): the load reads the new
@@ -637,7 +637,7 @@ void f_088BAB44(Cpu *c) {
  * Here it gets the L2 and R2 rows of P1 - P4 CONFIG: the same fourteen rows, 14 apart. Our row per
  * player (pex) maps to the game's (L2 / R2 to COMMAND's, which has no picture); up / down, and left
  * / right on L2 / R2, are ours; the rest is the game's. The 2 of L2 / R2 and their pictures are the
- * ones P1 - P4 CONFIG uses (our page 4; kind 0x93 objects). Leaving saves (sfa3r.cfg). */
+ * ones P1 - P4 CONFIG uses (our page 4; kind 0x93 objects). Leaving saves (sfa3mr.cfg). */
 void f_088B9CEC(Cpu *c);                    /* up / down with repeat: a0 pad, a1 row, a2 last row; v0 row */
 void f_088B9B30(Cpu *c);                    /* left / right with repeat: a0 pad, a1 value, a2 last value; v0 value */
 #define PCTX      0x08B02E24u

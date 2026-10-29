@@ -107,7 +107,7 @@ def widescreen_overlay(boot, work):
 
 def run(*args):
     print('>', ' '.join(os.path.relpath(a, ROOT) if os.path.isabs(a) else a for a in args)); sys.stdout.flush()
-    subprocess.check_call([sys.executable, '-I'] + list(args))
+    subprocess.check_call([sys.executable, '-I'] + list(args), stderr=subprocess.STDOUT)   # (one stream: notes are not errors)
 
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith('--')]

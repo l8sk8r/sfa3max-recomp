@@ -42,7 +42,12 @@ Set-Location -Path $PSScriptRoot
 function Step([string]$Title, [scriptblock]$Action) {
     Write-Host ""
     Write-Host "==> $Title" -ForegroundColor Cyan
-    & $Action
+    # Windows PowerShell 5.1 turns anything a program writes to stderr (progress, notes) into an
+    # error, which "Stop" would make fatal: the step's success is its exit code instead.
+    $keep = $ErrorActionPreference; $ErrorActionPreference = "Continue"
+    $global:LASTEXITCODE = 0
+    & $Action 2>&1 | ForEach-Object { if ($_ -is [System.Management.Automation.ErrorRecord]) { Write-Host $_.Exception.Message } else { Write-Host $_ } }
+    $ErrorActionPreference = $keep
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAILED: $Title (exit code $LASTEXITCODE)" -ForegroundColor Red
         exit $LASTEXITCODE
